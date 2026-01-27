@@ -13,3 +13,20 @@ Personal Project to build a progressive, maintainable, scalable web and app IT p
    npm install
    npm run dev
    ```
+
+## Usage Commands
+# Build and start all services
+docker-compose up --build
+
+# Start in detached mode
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs server
+docker-compose logs client
+
+# Rebuild specific service
+docker-compose build server
