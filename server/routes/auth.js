@@ -2,15 +2,17 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { generateToken } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+const { registerSchema, loginSchema } = require('../schemas/auth');
 
 const router = express.Router();
 
 // Mock user store (replace with database)
 const users = [];
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', vslidate(registerSchema), async (req, res, next) => {
     try {
-        const { emai, password } req.body;
+        const { email, password } = req.body;
 
         const existingUser = users.find(u => u.email === email);
         if (existingUser) {
@@ -24,7 +26,7 @@ router.post('/register', async (req, res, next) => {
         const token = generateToken({ id: user.id, email: user.email });
 
         res.cookie('token', token, {
-            httpOnly: true;
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -36,7 +38,7 @@ router.post('/register', async (req, res, next) => {
     }
 });
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', validate(loginSchema), async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
