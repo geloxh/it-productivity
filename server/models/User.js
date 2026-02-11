@@ -2,25 +2,26 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  _id: ObjectId,
-  firstName: String,
-  lastName: String,
-  email: String (unique, indexed),
-  password: String (hashed),
-  role: ['SysAdmin', 'employee', 'guest'],
-  employeeId: String (unique),
-  department: String,
-  jobTitle: String,
-  phoneNumber: String,
-  isActive: Boolean,
-  lastLogin: Date,
-  createdAt: Date,
-  updatedAt: Date
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['SysAdmin', 'employee', 'guest'], default: 'SysAdmin' },
+  employeeId: { type: String, unique: true, sparse: true },
+  department: { type: mongoode.Schema.Types.ObjectId, ref: 'Department' },
+  jobTitle: { type: String },
+  phoneNumber: { type: String },
+  isActive: { type: Boolean, default: true },
+  lastLogin: { type: Date },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  if (!this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10 );
+  }
+  this.updateAt = Date.now();
   next();
 });
 
