@@ -1,23 +1,10 @@
 const express = require('express');
-const {
-    getAllUsers,
-    getUserById,
-    createUser,
-    //updateUser,
-    // deleteUser
-} = require('../controllers/userController');
-
-
 const router = express.Router();
+const { validate } = require('../middleware/validate');
+const { createTicketSchema, updateTicketSchema, addCommentSchema } = require('../validators/ticket.validator');
 
-// Route to /api/v1/users
-router.route('/')
-    .get(getAllUsers)
-    .post(createUser);
-
-router.route('/:id')
-    .get(getUserbyId);
-    // .patch(updateUser)
-    // .delete(deleteUser);
+router.post('/', validate(createTicketSchema), ticketController.create);
+router.put('/:id', validate(updateTicketSchema), ticketController.update);
+router,post('/:id/comments', validate(addCommentSchema), ticketController.addComment);
 
 module.exports = router;
