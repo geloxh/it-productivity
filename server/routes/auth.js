@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -70,5 +71,6 @@ router.get('/me', authenticate, async (req, res, next) => {
     next(error);
   }
 });
+
 
 module.exports = router;

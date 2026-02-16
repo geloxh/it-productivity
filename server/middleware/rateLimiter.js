@@ -20,3 +20,12 @@ const authLimiter = rateLimit ({
     message: 'Too many login attempts, please try again later.',
     skipSuccessfulRequests: true,
 });
+
+// Moderate limiter for ticket creation 
+const ticketLimiter = rateLimit ({
+    windowMS: 60 * 1000, // 60,000 milliseconds = 1 minute
+    max: 10, // 10 tickets per minute
+    message: 'Too many tickets created, please slow down.',
+});
+
+module.exports = { apiLimiter, authLimiter, ticketLimiter };

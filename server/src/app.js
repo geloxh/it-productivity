@@ -10,6 +10,8 @@ const express = require('express');
 const userRoutes = require('./routes/userRoutes');
 const ticketRoutes = require('./routes/ticketRoutes'); // Assuming you create this
 const assetRoutes = require('./routes/assetRoutes');   // Assuming you create this
+const { apiLimiter, authLimiter, ticketLimiter } = require('../middleware/rateLimiter');
+
 
 const app = express();
 
@@ -24,6 +26,7 @@ app.use(helmet());
 app.use(cors({ credentials: true, origin: process.env.CLIENT_URL || 'http://localhost:3000' }));
 app.use(cookieParser());
 app.use(express.json());
+
 
 // Mount the routers
 app.use('/api/v1/users', userRoutes);
@@ -48,5 +51,8 @@ app.use('*', (req, res, next) => {
 
 // Global error handler
 app.use(errorHandler);
+
+// Apply general auth to all API routes
+app.use('/api/', apiLimiter);
 
 module.exports = app;
