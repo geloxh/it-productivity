@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');
+const apiRoutes = require('../routes');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const pinoHttp = require('pino-http');
@@ -54,5 +54,7 @@ app.use(errorHandler);
 
 // Apply general auth to all API routes
 app.use('/api/', apiLimiter);
+
+app.use('/api', apiRoutes);
 
 module.exports = app;
