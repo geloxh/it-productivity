@@ -10,6 +10,7 @@ const express = require('express');
 const userRoutes = require('./routes/userRoutes');
 const ticketRoutes = require('./routes/ticketRoutes'); // Assuming you create this
 const assetRoutes = require('./routes/assetRoutes');   // Assuming you create this
+const cors = require('cors');
 const { apiLimiter, authLimiter, ticketLimiter } = require('../middleware/rateLimiter');
 
 
@@ -56,5 +57,8 @@ app.use(errorHandler);
 app.use('/api/', apiLimiter);
 
 app.use('/api', apiRoutes);
+
+// Configure CORS
+app.use(cors({ credentials: true, origin: process.env.CLIENT_URL || 'http://localhost:3000' }));
 
 module.exports = app;
