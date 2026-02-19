@@ -23,11 +23,23 @@ app.use(pinoHttp({ logger }));
 app.use(express.json());
 
 // Security and parsing middleware
-app.use(helmet());
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL || 'http://localhost:3000' }));
-app.use(cookieParser());
-app.use(express.json());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc:  ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        }
+    },
+    crossOriginEmbedderPolicy: false
+}));
 
+// For dev use
+app.use(helmet({
+    contentSecurityPolicy: process.env.NODE_ENV === 'production',
+    crossOriginEmbeddedrPolicy: false
+}));
 
 // Mount the routers
 app.use('/api/v1/users', userRoutes);
