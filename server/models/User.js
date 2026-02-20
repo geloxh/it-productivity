@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['SysAdmin', 'employee', 'guest'], default: 'SysAdmin' },
   employeeId: { type: String, unique: true, sparse: true },
-  department: { type: mongoode.Schema.Types.ObjectId, ref: 'Department' },
+  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
   jobTitle: { type: String },
   phoneNumber: { type: String },
   isActive: { type: Boolean, default: true },

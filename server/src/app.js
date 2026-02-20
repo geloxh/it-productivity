@@ -1,76 +1,57 @@
 const express = require('express');
-const apiRoutes = require('../routes');
+const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const pinoHttp = require('pino-http');
 const logger = require('../config/logger');
 const errorHandler = require('../middleware/errorHandler');
+const { apiLimiter, authLimiter } = require('../middleware/rateLimiter');
+const apiRoutes = require('../routes');
 const authRoutes = require('../routes/auth');
-const express = require('express');
-const userRoutes = require('./routes/userRoutes');
-const ticketRoutes = require('./routes/ticketRoutes'); // Assuming you create this
-const assetRoutes = require('./routes/assetRoutes');   // Assuming you create this
-const cors = require('cors');
-const { apiLimiter, authLimiter, ticketLimiter } = require('../middleware/rateLimiter');
 
 
 const app = express();
 
-// Pino HTTP logging middleware
+// CORS - must be early
+app.use(cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL || 'http://localhost:3000'
+}));
+
+// Logging
 app.use(pinoHttp({ logger }));
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-// Security and parsing middleware
+// Security
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc:  ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https:"],
-        }
-    },
+    contentSecurityPolicy: process.env.NODE_ENV === 'production',
     crossOriginEmbedderPolicy: false
 }));
 
-// For dev use
-app.use(helmet({
-    contentSecurityPolicy: process.env.NODE_ENV === 'production',
-    crossOriginEmbeddedrPolicy: false
-}));
+// Body parsing
+app.use(express.json());
+app.use(cookieParser());
 
-// Mount the routers
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/tickets', ticketRoutes);
-app.use('/api/v1/assets', assetRoutes);
+// Health check (before rate limiters)
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK '});
+});
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Rate limiters
+app.use('/api/auth', authLimiter);
+app.use('/api, apiLimiter', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.get('/health', (req, res) => {
-    res.json({ status: 'OK' });
-});
+app.use('/api', apiRoutes);
 
-// 404 Handler
+// 404 handler
 app.use('*', (req, res, next) => {
     const error = new Error(`Route ${req.originalUrl} not found`);
-    error.statusCode =  404;
+    error.statusCode = 404;
     next(error);
 });
 
-// Global error handler
+// Error handler
 app.use(errorHandler);
-
-// Apply general auth to all API routes
-app.use('/api/', apiLimiter);
-
-app.use('/api', apiRoutes);
-
-// Configure CORS
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL || 'http://localhost:3000' }));
 
 module.exports = app;
