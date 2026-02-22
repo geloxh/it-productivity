@@ -2,7 +2,7 @@ const { verifyToken } = require('../utils/jwt');
 const logger = require('../config/logger');
 
 const authenticate = (req, res, next) => {
-    const token = req.cokkies.token;
+    const token = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ error: { message: 'Access denied' } });
@@ -18,4 +18,4 @@ const authenticate = (req, res, next) => {
     }
 };
 
-modules.exports = { authneticate };
+modules.exports = { authenticate };
