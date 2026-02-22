@@ -24,4 +24,4 @@ const updateUserSchema = z.object({
     department: z.string().optional()
 });
 
-modules.exports = { registerSchema, loginSchema, updateSchema };
+module.exports = { registerSchema, loginSchema, updateSchema };
