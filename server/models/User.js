@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['SysAdmin', 'employee', 'guest'], default: 'SysAdmin' },
+  role: { type: String, enum: ['SysAdmin', 'Admin', 'employee', 'guest'], default: 'SysAdmin' },
   employeeId: { type: String, unique: true, sparse: true },
   department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
   jobTitle: { type: String },
