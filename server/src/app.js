@@ -38,7 +38,7 @@ app.get('/health', (req, res) => {
 
 // Rate limiters
 app.use('/api/auth', authLimiter);
-app.use('/api, apiLimiter', apiLimiter);
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
