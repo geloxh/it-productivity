@@ -48,3 +48,27 @@ const PERMISSIONS = {
         Guest: ['read']
     }
 };
+
+const checkPermission = (resource, action) => {
+    return (req, res, next) => {
+        const userRole = req.user.role;
+        const permissions = PERMISSIONS[resource]?.[userRole] || [];
+
+        if (permissions.includes(action) || permissions.includes(action.split(':')[0])) {
+            return next();
+        }
+
+        return res.status(403).json({ error: { message: 'Access denied.'} });
+    };
+};
+
+const requireRole = (...roles) => {
+    return (req, res, next) => {
+        if (roles.includes(req.user.role)) {
+            return next();
+        }
+        return res.status(403).json({ error: {message: 'Insufficient permissions' } });
+    };
+};
+
+module.exports = { checkPermission, requireRole, PERMISSIONS };
