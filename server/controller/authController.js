@@ -1,8 +1,9 @@
 const { register, login } = require('../services/authService');
+const { deleteSession } = require('../services/sessionService');
 
 exports.register = async (req, res, next) => {
     try {
-        const { user, token } = await register(req.body);
+        const { user, token } = await register(req.body, req);
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -20,7 +21,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const { user, token } = await login(email, password);
+        const { user, token } = await login(email, password, req);
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -35,9 +36,15 @@ exports.login = async (req, res, next) => {
     }
 };
 
-exports.logout = (req, res) => {
-    res.clearCookie('token');
-    res.json({ message: 'Logout successfull' });
+exports.logout = async (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        if (token) await deleteSession(token);
+        res.clearCookie('token');
+        res.json({ message: 'Logout successful.' });
+    } catch (error) {
+        next(error);
+    }
 };
 
 exports.getProfile = async (req, res, next) => {
