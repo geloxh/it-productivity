@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const { checkPermission } = require('../../middleware/rbac');
 const knowledgeBaseController = require('../../controller/knowledgeBaseController');
 
-router.post('/', knowledgeBaseController.create);
-router.get('/', knowledgeBaseController.getAll);
-router.get('/:id', knowledgeBaseController.getById);
-router.put('/:id', knowledgeBaseController.update);
-router.delete('/:id', knowledgeBaseController.delete);
+router.post('/', checkPermission('knowledgeBase', 'create'), knowledgeBaseController.create);
+router.get('/', checkPermission('knowledgeBase', 'read'), knowledgeBaseController.getAll);
+router.get('/:id', checkPermission('knowledgeBase', 'read'), knowledgeBaseController.getById);
+router.put('/:id', checkPermission('knowledgeBase', 'update'), knowledgeBaseController.update);
+router.delete('/:id', checkPermission('knowledgeBase', 'delete'), knowledgeBaseController.delete);
 
 module.exports = router;
