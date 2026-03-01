@@ -20,11 +20,11 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id).populate('projectAssignedto');
+        const task = await Task.findById(req.params.id).populate('project Assignedto');
         if (!task) return  res.status(404).json({ error: 'Task not found.' });
         res.json(task);
     } catch (error) {
-        res.json(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 

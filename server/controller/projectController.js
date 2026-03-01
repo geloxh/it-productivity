@@ -1,6 +1,6 @@
 const Project = require('../models/Project');
 
-exports.create = async (requestAnimationFrame, res) => {
+exports.create = async (req, res) => {
     try {
         const project = await Project.create(req.body);
         res.status(201).json(project);
@@ -12,7 +12,7 @@ exports.create = async (requestAnimationFrame, res) => {
 exports.getAll = async (req, res) => {
     try {
         const project = await Project.find().populate('owner number');
-        res.json(projects);
+        res.json(project);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -34,6 +34,6 @@ exports.delete = async (req, res) => {
         if (!project) return res.status(404).json({ error: "Project not found." });
         res.json({ message: 'Project deleted' });
     } catch (error) {
-        res.status(500)({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 };

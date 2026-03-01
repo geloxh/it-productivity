@@ -11,8 +11,8 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
     try {
-        const users = await User.find().populate('department');
-        res.json(users);
+        const user = await User.find().populate('department');
+        res.json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -21,7 +21,7 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).populate('department');
-        res.json(users);
+        res.json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -29,11 +29,11 @@ exports.getById = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).populate('department');
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!user) return res.status(404).json({ error: 'User not found.'});
         res.json(user);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 

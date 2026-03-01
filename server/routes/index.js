@@ -16,6 +16,6 @@ router.use('/v1/assets', assetRoutes);
 router.use('/v1/projects', projectRoutes);
 router.use('/v1/tasks', taskRoutes);
 router.use('/v1/auth', authRoutes);
-router.use('./v1/sessions', sessionRoutes);
+router.use('/v1/sessions', sessionRoutes);
 
 module.exports = router;

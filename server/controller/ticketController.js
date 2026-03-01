@@ -30,7 +30,7 @@ exports.getById = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const ticket = await Ticket.findByIdAndUpdate(req.paramsid, req.body, { new: true });
+        const ticket = await Ticket.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!ticket) return res.status(404).json({ error: 'Ticket not found.'});
         res.json(ticket);
     } catch (error) {
