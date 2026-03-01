@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
     priority: { type: String, enum: ['Low', 'Medium', 'High', 'Critical'], default: 'Medium' },
     dueDate: { type: Date },
     createdAt: { type: Date, default: Date.now },
-    updatedAT: { type: Date, default: Date.now }
+    updatedAt: { type: Date, default: Date.now }
 });
 
 taskSchema.pre('save', function(next) {

@@ -18,4 +18,4 @@ projectSchema.pre('save', function(next) {
     next();
 });
 
-modules.exports = mongoose.model('Project', projectSchema);
+module.exports = mongoose.model('Project', projectSchema);
