@@ -1,6 +1,6 @@
 const logger = require('../config/logger');
 
-const errorHandler = (err, req, res) => {
+const errorHandler = (err, req, res, next) => {
     logger.error({
         err,
         req: { method: req.method, url: req.url },

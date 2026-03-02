@@ -9,7 +9,6 @@ const { apiLimiter, authLimiter } = require('../middleware/rateLimiter');
 const apiRoutes = require('../routes');
 const authRoutes = require('../routes/auth');
 
-
 const app = express();
 
 // CORS - must be early
