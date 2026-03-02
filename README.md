@@ -5,6 +5,16 @@ Personal Project to build a progressive, maintainable, scalable web and app IT p
 - **client/**: React.js Frontend application.
 - **server/**: Node.js/Express.js Backend API.
 
+### PROJECT FEATURES
+- **User Authentication** : Register, Login, Logout
+- **Company Asset Management** : Add, Remove, Update, and View IT devices such as servers, networks, storage, and applications.
+- **Alerts and Notifications** : Receive alerts and notifications for IT resource issues.
+- **Dashboards and Reports** : View dashboards and reports for IT resource performance and usage.
+- **Employee Credentials Management** : Add, Remove, Update, and View employee information.
+
+### UPCOMING FEATURES
+- **Request for Payment Form** : Automated fill up form for payment request.
+
 ### Installation
 
 1. **Backend Setup**

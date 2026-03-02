@@ -7,6 +7,7 @@ const projectController = require('../../controller/projectController');
 
 router.post('/', checkPermission('projects', 'create'), validate(createProjectSchema), projectController.create);
 router.get('/', checkPermission('projects', 'read'), projectController.getAll);
+router.get('/:id', checkPermission('projects', 'read'), projectController.getById);
 router.put('/:id', checkPermission('projects', 'update'), validate(updateProjectSchema), projectController.update);
 router.delete('/:id', checkPermission('projects', 'delete'), projectController.delete);
 
