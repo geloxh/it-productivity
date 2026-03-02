@@ -32,15 +32,18 @@ services:
       - app-network
 
   db:
-    image:
+    image: mongo:latesr
     environment:
+      - MONGO_INITDB_DATABASE=it-productivity
     ports:
+      - "27017:27017"
     volumes:
+      - "mongo-data:/data/db"
     networks:
-
+      - app-network
 volumes:
-
+  mongo-data:
 
 networks:
   app-network:
-    driver:
+    driver: bridge
