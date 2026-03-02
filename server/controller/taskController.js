@@ -20,7 +20,7 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id).populate('project Assignedto');
+        const task = await Task.findById(req.params.id).populate('project assignedTo');
         if (!task) return  res.status(404).json({ error: 'Task not found.' });
         res.json(task);
     } catch (error) {
