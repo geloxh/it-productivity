@@ -10,7 +10,18 @@ Personal Project to build a progressive, maintainable, scalable web and app IT p
 - **Company Asset Management** : Add, Remove, Update, and View IT devices such as servers, networks, storage, and applications.
 - **Alerts and Notifications** : Receive alerts and notifications for IT resource issues.
 - **Dashboards and Reports** : View dashboards and reports for IT resource performance and usage.
-- **Employee Credentials Management** : Add, Remove, Update, and View employee information.
+
+- **Ticket system**
+
+- **Project management**
+
+- **Task management**
+
+- **Knowledge Base**
+
+- **Session management**
+
+- **Audit logging** 
 
 ### UPCOMING FEATURES
 - **Request for Payment Form** : Automated fill up form for payment request.
