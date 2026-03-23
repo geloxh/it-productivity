@@ -1,6 +1,15 @@
 ### IT PRODUCTIVITY SOFTWARE
 Personal Project to build a progressive, maintainable, scalable web and app IT productivity tool.
 
+
+## TECH-STACK
+- *MongoDB*
+- *ExpressJS*
+- *React*
+- *Vite*
+- *Plain CSS*
+- *NodeJS*
+
 ## Project Structure
 - **client/**: React.js Frontend application.
 - **server/**: Node.js/Express.js Backend API.
