@@ -7,17 +7,19 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Assets from './pages/Assets'
 
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<login />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route element={<DashboardLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/assets" element={<Assets />} />                     
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/assets" element={<Assets />} />
+          </Route>
         </Route>
-      </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
