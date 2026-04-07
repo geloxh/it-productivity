@@ -14,8 +14,8 @@ const knowledgeBaseSchema = new mongoose.Schema({
 });
 
 knowledgeBaseSchema.pre('save', function(next) {
-    this.updateAt = Date.now();
+    this.updateAT = Date.now();
     next();
 });
 
-modules.exports = mongoose.model('KnowledgeBase', knowledgeBaseSchema);
+module.exports = mongoose.model('KnowledgeBase', knowledgeBaseSchema);

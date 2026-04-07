@@ -11,14 +11,16 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route element={<ProtectedRoute />}>
-          <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/assets" element={<Assets />} />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<DashboardLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/assets" element={<Assets />} />
+            </Route>
           </Route>
-        </Route>
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   )

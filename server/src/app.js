@@ -14,7 +14,7 @@ const app = express();
 // CORS - must be early
 app.use(cors({
     credentials: true,
-    origin: process.env.CLIENT_URL || 'http://localhost:3000'
+    origin: process.env.CLIENT_URL || 'http://localhost:5173'
 }));
 
 // Logging
@@ -44,7 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 
 // 404 handler
-app.use('*', (req, res, next) => {
+app.use((req, res, next) => {
     const error = new Error(`Route ${req.originalUrl} not found`);
     error.statusCode = 404;
     next(error);

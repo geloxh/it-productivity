@@ -5,6 +5,6 @@ const { createTicketSchema, updateTicketSchema, addCommentSchema } = require('..
 
 router.post('/', validate(createTicketSchema), ticketController.create);
 router.put('/:id', validate(updateTicketSchema), ticketController.update);
-router,post('/:id/comments', validate(addCommentSchema), ticketController.addComment);
+router.post('/:id/comments', validate(addCommentSchema), ticketController.addComment);
 
 module.exports = router;

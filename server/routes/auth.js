@@ -1,10 +1,17 @@
+const { createSession, deleteSession } = require('../services/sessionService');
 const express = require('express');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth');
-const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
 
 router.post('/register', async (req, res, next) => {
   try {
@@ -17,14 +24,10 @@ router.post('/register', async (req, res, next) => {
 
     const user = await User.create({ firstName, lastName, email, password, role });
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
-    
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await createSession(user._id, token, expiresAt, req);
 
+    res.cookie('token', token, COOKIE_OPTIONS);
     res.status(201).json({ message: 'User registered successfully', user: { id: user._id, email: user.email } });
   } catch (error) {
     next(error);
@@ -44,33 +47,23 @@ router.post('/login', async (req, res, next) => {
     await user.save();
 
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
-    
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await createSession(user._id, token, expiresAt, req);
 
+    res.cookie('token', token, COOKIE_OPTIONS);
     res.json({ message: 'Login successful', user: { id: user._id, email: user.email, role: user.role } });
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/logout', (req, res) => {
-  res.clearCookie('token');
-  res.json({ message: 'Logout successful' });
-});
-
 router.get('/me', authenticate, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
     res.json({ user });
   } catch (error) {
     next(error);
   }
 });
-
 
 module.exports = router;

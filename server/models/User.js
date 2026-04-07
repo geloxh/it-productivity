@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
-  password: { type: String, required: true },
+  password: { type: String, required: true, select: false },
   role: { type: String, enum: ['SysAdmin', 'Admin', 'Employee', 'Guest'], default: 'Employee' },
   employeeId: { type: String, unique: true, sparse: true },
   department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
@@ -17,12 +17,11 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function() {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10 );
+    this.password = await bcrypt.hash(this.password, 10);
   }
   this.updatedAt = Date.now();
-  next();
 });
 
 userSchema.methods.comparePassword = async function(candidatePassword) {
