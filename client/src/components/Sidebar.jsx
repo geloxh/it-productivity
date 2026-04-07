@@ -11,7 +11,7 @@ export default function Sidebar() {
             <div className="sidebar-logo">ITG Productivity</div>
             <nav>
                 {links.map(({ to, label }) => (
-                    <NavLink key={to} to={to} end className={({ isActive }) => isActive ? 'active' : ''}></NavLink>
+                    <NavLink key={to} to={to} end className={({ isActive }) => isActive ? 'active' : ''}>
                         {label}
                     </NavLink>
                 ))}
