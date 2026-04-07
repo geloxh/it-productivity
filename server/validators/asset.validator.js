@@ -7,13 +7,13 @@ const createAssetSchema = z.object ({
     category: z.enum(['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Software', 'Mobile']),
     manufacturer: z.string().optional(),
     model: z.string().optional(),
-    purchaseDate: z.string().dateTime.optional(),
+    purchaseDate: z.string().datetime().optional(),
     warrantyExpiry: z.string().datetime().optional()
 });
 
 const updateAssetSchema = z.object ({
     name: z.string().min(2).max(100).optional(),
-    status: z.enum(['Available', 'Assigned', 'Maintenance', 'Operating', 'Broken']).optional(),
+    status: z.enum(['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost']).optional(),
     assignedTo: z.string().nullable().optional()
 });
 

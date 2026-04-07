@@ -14,7 +14,7 @@ const updateTaskSchema = z.object({
     status: z.enum(['To-Do', 'In-Progress', 'Review', 'Done']).optional(),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical']).optional(),
     assignedTo: z.string().optional(),
-    dueDate: z.string().datetime().optiona()
+    dueDate: z.string().datetime().optional()
 });
 
 module.exports = { createTaskSchema, updateTaskSchema };

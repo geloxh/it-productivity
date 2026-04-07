@@ -5,7 +5,7 @@ const registerSchema = z.object({
     lastName: z.string().min(2).max(50),
     email: z.string().email(),
     password: z.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
-    role: z.enum(['SysAdmin', 'employee', 'guest']).optional(),
+    role: z.enum(['SysAdmin', 'Admin', 'Employee', 'Guest']).optional(),
     employeeId: z.string().optional(),
     department: z.string().optional(),
     jobTitle: z.string().optional()

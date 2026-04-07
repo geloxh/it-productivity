@@ -9,7 +9,7 @@ const assetRoutes = require('./v1/asset.routes');
 const projectRoutes = require('./v1/project.routes');
 const taskRoutes = require('./v1/task.routes');
 const authRoutes = require('./v1/auth.routes');
-const sessionRoutes = require('./session.routes');
+const sessionRoutes = require('./v1/session.routes');
 const departmentRoutes = require('./v1/department.routes');
 const knowledgeBaseRoutes = require('./v1/knowledgeBase.routes');
 

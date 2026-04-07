@@ -12,7 +12,7 @@ const createProjectSchema = z.object ({
 const updateProjectSchema = z.object({
     name: z.string().min(3).max(100).optional(),
     description: z.string().optional(),
-    status: z.enum(['Plannning', 'Active', 'On-Hold', 'Completed', 'Cancelled']).optional(),
+    status: z.enum(['Planing', 'Active', 'On-Hold', 'Completed', 'Cancelled']).optional(),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical' ]).optional(),
     members: z.array(z.string()).optional()
 });
