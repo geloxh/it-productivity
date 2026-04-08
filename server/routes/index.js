@@ -12,6 +12,7 @@ const authRoutes = require('./v1/auth.routes');
 const sessionRoutes = require('./v1/session.routes');
 const departmentRoutes = require('./v1/department.routes');
 const knowledgeBaseRoutes = require('./v1/knowledgeBase.routes');
+const dashboardRoutes = require('./v1/dashboard.routes');
 
 router.use('/v1/auth', authRoutes);
 router.use('/v1/users', authenticate, userRoutes);
@@ -22,5 +23,6 @@ router.use('/v1/tasks', authenticate, taskRoutes);
 router.use('/v1/sessions', authenticate, sessionRoutes);
 router.use('/v1/departments', authenticate, departmentRoutes);
 router.use('/v1/knowledge-base', authenticate, knowledgeBaseRoutes);
+router.use('/v1/dashboard', authenticate, dashboardRoutes);
 
 module.exports = router;
