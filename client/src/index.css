@@ -98,7 +98,7 @@ code {
   background: var(--code-bg);
 }
 
-/* ── Layout ── */
+/* === Layout === */
 .layout {
   display: flex;
   flex: 1;
@@ -187,7 +187,7 @@ code {
   flex: 1;
 }
 
-/* ── Auth ── */
+/* === Auth === */
 .auth-page {
   display: flex;
   justify-content: center;
@@ -255,3 +255,36 @@ code {
   font-size: 14px;
   margin: 0;
 }
+
+/* === Dashboard === */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text-h);
+  line-height: 1;
+}
+

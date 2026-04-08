@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const pinoHttp = require('pino-http');
 const logger = require('../config/logger');
 const errorHandler = require('../middleware/errorHandler');
-const { apiLimiter, authLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const apiRoutes = require('../routes');
 const authRoutes = require('../routes/auth');
 
@@ -36,7 +36,6 @@ app.get('/health', (req, res) => {
 });
 
 // Rate limiters
-app.use('/api/auth', authLimiter);
 app.use('/api', apiLimiter);
 
 // Routes

@@ -3,6 +3,7 @@ const express = require('express');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimiter')
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const COOKIE_OPTIONS = {
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', authLimiter, async (req, res, next) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
 

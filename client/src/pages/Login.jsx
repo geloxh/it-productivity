@@ -17,7 +17,7 @@ export default function Login() {
     }
 
     return (
-        <didv className="auth-page">
+        <div className="auth-page">
             <form className="auth-form" onSubmit={handleSubmit}>
                 <h2>Login</h2>
                 {error && <p className="error">{error}</p>}
@@ -26,6 +26,6 @@ export default function Login() {
                 <button type="submit">Login</button>
                 <p>No account? <Link to="/register">Register</Link></p>
             </form>
-        </didv>
+        </div>
     )
 }
