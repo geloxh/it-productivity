@@ -8,9 +8,9 @@ import Dashboard from './pages/Dashboard'
 import Assets from './pages/Assets'
 import Tickets from './pages/Tickets'
 import Projects from './pages/Projects'
-import Tasks from './pages/Tasks'
+import Task from './pages/Task'
 import KnowledgeBase from './pages/KnowledgeBase'
-import Users from './pages/Users'
+import User from './pages/User'
 import Sessions from './pages/Sessions'
 
 export default function App() {
@@ -26,9 +26,9 @@ export default function App() {
               <Route path="/assets" element={<Assets />} />
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/projects" element={<Projects />} />
-              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/tasks" element={<Task />} />
               <Route path="/knowledge-base" element={<KnowledgeBase />} />
-              <Route path="/users" element={<Users />} />
+              <Route path="/user" element={<User />} />
               <Route path="/sessions" element={<Sessions />} />
             </Route>
           </Route>
