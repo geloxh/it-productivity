@@ -10,7 +10,7 @@ router.post('/register', validate(registerSchema), async (req, res, next) => {
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-    const user = await User.create(req.body);
+    const user = await User.findOne({ email: req.body.email }).select('+password');
     const token = generateToken({ id: user._id, role: user.role });
     
     res.status(201).json({ user: { id: user._id, email: user.email }, token });

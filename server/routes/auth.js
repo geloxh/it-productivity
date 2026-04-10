@@ -67,4 +67,15 @@ router.get('/me', authenticate, async (req, res, next) => {
   }
 });
 
+router.post('/logout', async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (token) await deleteSession(token);
+    res.clearCookie('token');
+    res.json({ message: 'Logout successful.' }); 
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

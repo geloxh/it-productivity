@@ -7,5 +7,5 @@ export const dashboardApi = {
     getTickets: () => get('/tickets'),
     getProjects: () => get('/projects'),
     getTasks: () => get('/tasks'),
-    getTimeSeries: () => get('/timeseries'),s
+    getTimeSeries: () => get('/timeseries'),
 }
