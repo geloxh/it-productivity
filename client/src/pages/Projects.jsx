@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/index'
 
 export default function Projects() {
-    const [projects, setProjects] = useStae([])
+    const [projects, setProjects] = useState([])
     const [form, setForm] = useState({ name: '', description: '', priority: 'Medium' })
     const [error, setError] = useState(null)
 
