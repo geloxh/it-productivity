@@ -376,3 +376,97 @@ code {
   background: #e53e3e;
   color: #fff;
 }
+
+
+/* === Page Header === */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-header button {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* === Asset Form === */
+.asset-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.asset-form input,
+.asset-form select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text-h);
+}
+
+.asset-form button[type="submit"] {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ── Table ── */
+.asset-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.asset-table th,
+.asset-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.asset-table th {
+    color: var(--text);
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.btn-danger {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid #e53e3e;
+    color: #e53e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* ── Badges ── */
+.badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-available   { background: rgba(72,187,120,0.15); color: #276749; }
+.badge-assigned    { background: rgba(66,153,225,0.15); color: #2b6cb0; }
+.badge-maintenance { background: rgba(237,137,54,0.15); color: #c05621; }
+.badge-retired     { background: rgba(160,174,192,0.15); color: #4a5568; }
+.badge-lost        { background: rgba(229,62,62,0.15);  color: #c53030; }
