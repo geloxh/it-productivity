@@ -16,7 +16,7 @@ export default function Tickets() {
 
     const submit = async (e) => {
         e.preventDefault()
-        await api.post('/tickets'. form)
+        await api.post('/tickets', form)
         setForm({ title: '', description: '', priority: 'Low' })
         load()
     }

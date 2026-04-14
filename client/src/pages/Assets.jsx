@@ -51,7 +51,7 @@ export default function Assets() {
                     <input placeholder="Name *" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required/>
                     <input placeholder="Asset Tag *" value={form.assetTag} onChange={e => setForm(f => ({ ...f, assetTag: e.target.value }))} required/>
                     <input placeholder="Serial No." value={form.serialNumber} onChange={e => setForm(f => ({ ...f, serialNumber: e.target.value }))}/>
-                    <input placeholder="Manufacturer" value={form.manufacturer} onChange={e => setForm(f => ({ ...f, model: e.target.value }))} />
+                    <input placeholder="Manufacturer" value={form.manufacturer} onChange={e => setForm(f => ({ ...f, manufacturer: e.target.value }))} />
                     <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                         {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                     </select>
