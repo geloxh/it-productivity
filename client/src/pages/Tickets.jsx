@@ -1,60 +1,68 @@
-import { useEffect, useState } from 'react'
+import { useState, useCallback } from 'react'
 import { api } from '../api/index'
+import { useData } from '../hooks/useData'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 
-const PRIORITY_COLOR = { Low: '#38a169', Medium: '#d69e2e', High: '#dd6b20', Critical: '#e53e3e' }
-const STATUS_COLOR = { Open: '#3182ce', 'In-Progress': '#805ad5', Resolved: '#38a169', Closed: '#718096' }
+const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
+const PRIORITY_VARIANT = { Low: 'secondary', Medium: 'outline', High: 'default', Critical: 'destructive' }
+const STATUS_VARIANT = { Open: 'default', 'In-Progress': 'outline', Resolved: 'secondary', Closed: 'secondary' }
 
 export default function Tickets() {
-    const [tickets, setTickets] = useState([])
-    const [error, setError] = useState(null)
+    const fetcher = useCallback(() => api.get('/tickets').then(d => d.tickets ?? d), [])
+    const { data: tickets, loading, reload } = useData(fetcher)
     const [form, setForm] = useState({ title: '', description: '', priority: 'Low' })
-    const [loading, setLoading] = useState(true)
-
-    const load = () => api.get('/tickets').then(d => { setTickets(d.tickets ?? d); setLoading(false) }).catch(() => setError('Failed to load tickets.'))
-
-    useEffect(() => { load() }, [])
 
     const submit = async (e) => {
         e.preventDefault()
         await api.post('/tickets', form)
+        toast.success('Ticket created.')
         setForm({ title: '', description: '', priority: 'Low' })
-        load()
+        reload()
     }
 
-    const remove = async (id) => { await api.delete(`/tickets/${id}`); load() }
-
-    if (loading) return <p>Loading...</p>
-    if (error) return <p className="error">{error}</p>
+    const remove = async (id) => {
+        await api.delete(`/tickets/${id}`)
+        toast.success('Ticket deleted.')
+        reload()
+    }
 
     return (
-        <div>
+        <div className="space-y-4">
             <h2>Tickets</h2>
-            <form className="inline-form" onSubmit={submit}>
-                <input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required/>
-                <input placeholder="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required/>
-                <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>{['Low', 'Medium', 'High', 'Critical'].map(p => <option key={p}>{p}</option>)}</select>
-                <button type="submit">Add Ticket</button>
+            <form className="flex flex-wrap gap-2" onSubmit={submit}>
+                <Input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                <Input placeholder="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
+                <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
+                    <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                    <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+                <Button type="submit">Add Ticket</Button>
             </form>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tickets.map(t => (
-                        <tr key={t.id}>
-                            <td>{t.title}</td>
-                            <td><span className="badge" style={{ background: PRIORITY_COLOR[t.priority] }}>{t.priority}</span></td>
-                            <td><span className="badge" style={{ background: STATUS_COLOR[t.status] }}>{t.status}</span></td>
-                            <td><button className="btn-danger" onClick={() => remove(t._id)}>Delete</button></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {loading ? (
+                <div className="space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow><TableHead>Title</TableHead><TableHead>Priority</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {tickets.map(t => (
+                            <TableRow key={t._id}>
+                                <TableCell>{t.title}</TableCell>
+                                <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
+                                <TableCell><Badge variant={STATUS_VARIANT[t.status]}>{t.status}</Badge></TableCell>
+                                <TableCell><Button variant="destructive" size="sm" onClick={() => remove(t._id)}>Delete</Button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
         </div>
     )
 }
