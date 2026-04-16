@@ -1,12 +1,15 @@
 const BASE = 'api/v1'
 const ALLOWED = /^\/[a-zA-Z0-9\-/_]+$/
 
-const req = ( method, path, body ) => fetch(`${BASE}${path}`, {
-    method,
-    credentials: 'include',
-    headers: body ? { 'Content-Type': 'application/json' } : {},
-    ...(body && { body: JSON.stringify(body) })
-}).then(r => r.json())
+const req = (method, path, body) => {
+    if (!ALLOWED.test(path)) throw new Error('Invalid API path.')
+        return fetch(`${BASE}${path}`, {
+            method,
+            credentials: 'include',
+            headers: body ? { 'Content-Type': 'application/json' } : {},
+            ...(body && { body: JSON.stringify(body) })
+    }).then(r => r.json())
+}
 
 export const api = {
     get: (path) => req('GET', path),
