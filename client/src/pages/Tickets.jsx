@@ -9,14 +9,17 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 
+// Constants - lookup maps for color badge
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 const PRIORITY_VARIANT = { Low: 'secondary', Medium: 'outline', High: 'default', Critical: 'destructive' }
 const STATUS_VARIANT = { Open: 'default', 'In-Progress': 'outline', Resolved: 'secondary', Closed: 'secondary' }
 
 export default function Tickets() {
-    const fetcher = useCallback(() => api.get('/tickets').then(d => d.tickets ?? d), [])
+    const fetcher = useCallback(() => api.get('/tickets').then(d => d.tickets ?? d), []) // Data fetching
     const { data: tickets, loading, reload } = useData(fetcher)
-    const [form, setForm] = useState({ title: '', description: '', priority: 'Low' })
+
+    // form state & submission
+    const [form, setForm] = useState({ title: '', description: '', priority: 'Low' }) 
 
     const submit = async (e) => {
         e.preventDefault()
@@ -26,7 +29,7 @@ export default function Tickets() {
         reload()
     }
 
-    const remove = async (id) => {
+    const remove = async (id) => { // Delete handler
         await api.delete(`/tickets/${id}`)
         toast.success('Ticket deleted.')
         reload()

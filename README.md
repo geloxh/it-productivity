@@ -60,3 +60,14 @@ docker-compose logs client
 
 # Rebuild specific service
 docker-compose build server
+
+
+### Project Flow
+A summary flow
+
+## Tickets
+```
+   Page loads → useData fetches tickets → table renders
+   User fills form → submits → API creates ticket → list reloads
+   User clicks Delete → API deletes ticket → list reloads
+```
