@@ -1,63 +1,70 @@
-import { useEffect, useState } from 'react'
+import { useState, useCallback } from 'react'
 import { api } from '../api/index'
+import { useData } from '../hooks/useData'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 
-const CATEGORIES = [ 'Hardware', 'Software', 'Network', 'Security', 'General' ]
+const CATEGORIES = ['Hardware', 'Software', 'Network', 'Security', 'General']
 
 export default function KnowledgeBase() {
-    const [articles, setArticles] = useState([])
+    const fetcher = useCallback(() => api.get('/knowledge-base').then(d => d.articles ?? d), [])
+    const { data: articles, loading, reload } = useData(fetcher)
     const [form, setForm] = useState({ title: '', content: '', category: 'General' })
-    const [error, setError] = useState(null)
-
-    const load = () => api.get('/knowledge-base').then(d => setArticles(d.articles ?? d)).catch(() => setError('Failed to load articles.'))
-
-    useEffect(() => { load() }, [])
 
     const submit = async (e) => {
         e.preventDefault()
         await api.post('/knowledge-base', form)
+        toast.success('Article added.')
         setForm({ title: '', content: '', category: 'General' })
-        load()
+        reload()
     }
 
-    const remove = async (id) => { await api.delete(`/knowledge-base/${id}`);
-        load()
+        const remove = async (id) => {
+        await api.delete(`/knowledge-base/${id}`)
+        toast.success('Article deleted.')
+        reload()
     }
-
-    if (error) return <p className="error">{error}</p>
 
     return (
-        <div>
+        <div className="space-y-4">
             <h2>Knowledge Base</h2>
-            <form className="inline-form" onSubmit={submit}>
-                <input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required/>
-                <textarea placeholder="Content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} reuired/>
-                <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-                <button type="submit">Add Article</button>
+            <form className="flex flex-wrap gap-2" onSubmit={submit}>
+                <Input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                <Input placeholder="Content" value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} required />
+                <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                    <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                    <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+                <Button type="submit">Add Article</Button>
             </form>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Views</th>
-                        <th>Published</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {articles.map(a => (
-                        <tr key={a._id}>
-                            <td>{a.title}</td>
-                            <td>{a.category}</td>
-                            <td>{a.views}</td>
-                            <td>{a.isPublished ? 'Yes' : 'No'}</td>
-                            <td><button className="btn-danger" onClick={() => remove(a._id)}>Delete</button></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {loading ? (
+                <div className="space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Title</TableHead><TableHead>Category</TableHead>
+                            <TableHead>Views</TableHead><TableHead>Published</TableHead><TableHead></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {articles.map(a => (
+                            <TableRow key={a._id}>
+                                <TableCell>{a.title}</TableCell>
+                                <TableCell><Badge variant="outline">{a.category}</Badge></TableCell>
+                                <TableCell>{a.views ?? 0}</TableCell>
+                                <TableCell><Badge variant={a.isPublished ? 'default' : 'secondary'}>{a.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
+                                <TableCell><Button variant="destructive" size="sm" onClick={() => remove(a._id)}>Delete</Button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
         </div>
     )
 }
