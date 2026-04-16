@@ -1,5 +1,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { LogOut } from 'lucide-react'
 
 export default function Navbar() {
     const { user, logout } = useAuth()
@@ -13,7 +15,9 @@ export default function Navbar() {
     return (
         <header className="navbar">
             <span>{user?.email}</span>
-            <button onClick={handleLogout}>Logout</button>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+                <Logout size={14} />
+            </Button>
         </header>
     )
 }
