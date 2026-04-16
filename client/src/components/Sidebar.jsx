@@ -1,14 +1,15 @@
 import { NavLink } from 'react-router-dom'
+import { LayoutDashboard, Monitor, Ticket, FolderKanban, CheckSquare, BookOpen, Users, Shield } from 'lucide-react'
 
 const links = [
-    { to: '/', label: 'Dashboard' },
-    { to: '/assets', label: 'Assets' },
-    { to: '/tickets', label: 'Tickets' },
-    { to: '/projects', label: 'Projects' },
-    { to: '/tasks', label: 'Tasks' },
-    { to: '/knowledge-base', label: 'Knowledge-Base' },
+    { to: '/', label: 'Dashboard', icon : LayoutDashboard },
+    { to: '/assets', label: 'Assets', icon: Monitor },
+    { to: '/tickets', label: 'Tickets', icon: Ticket },
+    { to: '/projects', label: 'Projects', icon: FolderKanban },
+    { to: '/tasks', label: 'Tasks', icon: CheckSquare },
+    { to: '/knowledge-base', label: 'Knowledge-Base', icon: BookOpen },
     { to: '/users', label: 'Users' },
-    { to: '/sessions', label: 'Sessions' },
+    { to: '/sessions', label: 'Sessions', icon: Shield },
 ]
 
 export default function Sidebar() {
@@ -16,8 +17,9 @@ export default function Sidebar() {
         <aside className="sidebar">
             <div className="sidebar-logo">IT Productivity</div>
             <nav>
-                {links.map(({ to, label }) => (
+                {links.map(({ to, label, icon: Icon }) => (
                     <NavLink key={to} to={to} end className={({ isActive }) => isActive ? 'active' : ''}>
+                        <Icon size={10} />
                         {label}
                     </NavLink>
                 ))}
