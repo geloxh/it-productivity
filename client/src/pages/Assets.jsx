@@ -1,95 +1,93 @@
-import { useEffect, useState } from 'react'
-
-const BASE = '/api/v1/assets'
-const api = {
-    getAll: () => fetch(BASE, { credentials: 'include' }).then(r => r.json()),
-    create: (body) => fetch(BASE, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json()),
-    delete: (id) => fetch(`${BASE}/${id}`, { method: 'DELETE', credentials: 'include' }).then(r => r.json()),
-}
+import { useState, useCallback } from 'react'
+import { api } from '../api/index'
+import { useData } from '../hooks/useData'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 
 const CATEGORIES = ['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Software', 'Mobile']
-const EMPTY_FORM = { name: '', assetTag: '', category: 'Laptop', manufacturer: '', model: '', serialNumber: '' } 
+const EMPTY = { name: '', assetTag: '', category: 'Laptop', manufacturer: '', model: '', serialNumber: '' }
+const STATUS_VARIANT = { Available: 'secondary', Assigned: 'default', Maintenance: 'outline', Retired: 'secondary', Lost: 'destructive' }
 
 export default function Assets() {
-    const [assets, setAssets] = useState([])
-    const [form, setForm] = useState(EMPTY_FORM)
+    const fetcher = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
+    const { data: assets, loading, reload } = useData(fetcher)
+    const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
-    const [error, setError] = useState(null)
 
-    useEffect (() => { load() }, [])
-
-    const load = () => api.getAll().then(setAssets).catch(() => setError('Failed to load assets.'))
+    const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         const res = await api.create(form)
-        if (res.error) return setError(res.error)
-            setForm(EMPTY_FORM)
-            setShowForm(false)
-            load()
+        if (res.error) return toast.error(res.error)
+        toast.success('Asset added.')
+        setForm(EMPTY)
+        setShowForm(false)
+        reload()
     }
 
-    const handleDelete =  async (id) => {
-        if (!confirm('Delete this asset?')) return
-        await api.delete(id)
-        load()
+    const handleDelete = async (id) => {
+        await api.delete(`/assets/${id}`)
+        toast.success('Asset deleted.')
+        reload()
     }
 
     return (
-        <div>
+        <div className="space-y-4">
             <div className="page-header">
                 <h2>Assets</h2>
-                <button onClick={() => setShowForm(v => !v)}>
+                <Button variant={showForm ? 'outline' : 'default'} onClick={() => setShowForm(v => !v)}>
                     {showForm ? 'Cancel' : '+ Add Asset'}
-                </button>
+                </Button>
             </div>
-
-            { error && <p className="error">{error}</p>}
 
             {showForm && (
                 <form className="asset-form" onSubmit={handleSubmit}>
-                    <input placeholder="Name *" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required/>
-                    <input placeholder="Asset Tag *" value={form.assetTag} onChange={e => setForm(f => ({ ...f, assetTag: e.target.value }))} required/>
-                    <input placeholder="Serial No." value={form.serialNumber} onChange={e => setForm(f => ({ ...f, serialNumber: e.target.value }))}/>
-                    <input placeholder="Manufacturer" value={form.manufacturer} onChange={e => setForm(f => ({ ...f, manufacturer: e.target.value }))} />
-                    <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-                        {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                    </select>
-                    <button type="submit">Save Asset</button>
+                    <Input placeholder="Name *" value={form.name} onChange={set('name')} required />
+                    <Input placeholder="Asset Tag *" value={form.assetTag} onChange={set('assetTag')} required />
+                    <Input placeholder="Serial No." value={form.serialNumber} onChange={set('serialNumber')} />
+                    <Input placeholder="Manufacturer" value={form.manufacturer} onChange={set('manufacturer')} />
+                    <Input placeholder="Model" value={form.model} onChange={set('model')} />
+                    <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Button type="submit">Save Asset</Button>
                 </form>
             )}
 
-            <table className="asset-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Tag</th>
-                        <th>Category</th>
-                        <th>Manufacturer</th>
-                        <th>Model</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {assets.length === 0 && (
-                        <tr>
-                            <td colSpan={7} style={{ textAlign: 'center', padding: '24px' }}>No assets found.</td>
-                        </tr>
-                    )}
-                    {assets.map( a => (
-                        <tr key={a._id}>
-                            <td>{a.name}</td>
-                            <td><code>{a.assetTag}</code></td>
-                            <td>{a.category}</td>
-                            <td>{a.manufacturer}</td>
-                            <td>{a.model || '—'}</td>
-                            <td><span className={`badge badge-${a.status?.toLowerCase()}`}>{a.status}</span></td>
-                            <td><button className="btn-danger" onClick={() => handleDelete(a._id)}>Delete</button></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {loading ? (
+                <div className="space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead><TableHead>Tag</TableHead><TableHead>Category</TableHead>
+                            <TableHead>Manufacturer</TableHead><TableHead>Model</TableHead>
+                            <TableHead>Status</TableHead><TableHead></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {assets.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No assets found.</TableCell></TableRow>}
+                        {assets.map(a => (
+                            <TableRow key={a._id}>
+                                <TableCell>{a.name}</TableCell>
+                                <TableCell><code>{a.assetTag}</code></TableCell>
+                                <TableCell>{a.category}</TableCell>
+                                <TableCell>{a.manufacturer}</TableCell>
+                                <TableCell>{a.model || '—'}</TableCell>
+                                <TableCell><Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge></TableCell>
+                                <TableCell><Button variant="destructive" size="sm" onClick={() => handleDelete(a._id)}>Delete</Button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
         </div>
     )
 }
