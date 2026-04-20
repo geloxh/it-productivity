@@ -23,7 +23,7 @@ export default function Assets() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const res = await api.create(form)
+        const res = await api.post('/assets', form)
         if (res.error) return toast.error(res.error)
         toast.success('Asset added.')
         setForm(EMPTY)
@@ -90,4 +90,4 @@ export default function Assets() {
             )}
         </div>
     )
-}
+} 
