@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 
 export function useData (fetcher) {
-    const [data, setData] = useState
+    const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const load = useCallback(() => {
