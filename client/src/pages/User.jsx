@@ -6,7 +6,10 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Users() {
-    const fetcher = useCallback(() => api.get('/users').then(d => d.users ?? d), [])
+    const fetcher = useCallback(() => api.get('/users').then(d => { 
+      const result = d.users ?? d 
+      return Array.isArray(result) ? result : []
+    }), [])
     const { data: users, loading } = useData(fetcher)
 
     return (
