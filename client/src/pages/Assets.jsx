@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
@@ -32,9 +33,14 @@ export default function Assets() {
     }
 
     const handleDelete = async (id) => {
-        await api.delete(`/assets/${id}`)
+        const prev = assets
+        setAssets(a => a.filter(x => x.id !== id))
+        const res = await api.delete(`/assets/${id}`)
+        if (res.error) {
+            setAssets(prev)
+            return toast.error(res.error)
+        }
         toast.success('Asset deleted.')
-        reload()
     }
 
     return (
@@ -82,7 +88,18 @@ export default function Assets() {
                                 <TableCell>{a.manufacturer}</TableCell>
                                 <TableCell>{a.model || '—'}</TableCell>
                                 <TableCell><Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge></TableCell>
-                                <TableCell><Button variant="destructive" size="sm" onClick={() => handleDelete(a._id)}>Delete</Button></TableCell>
+                                <TableCell>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="sm">Delete</Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <p>Delete <strong>{a.name}</strong>? This cannot be undone.</p>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(a._id)}>Delete</AlertDialogAction>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
