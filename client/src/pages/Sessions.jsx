@@ -1,38 +1,52 @@
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { api } from '../api/index'
+import { useData } from '../hooks/useData'
+import { Button } from '@/components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 
 export default function Sessions() {
-  const [sessions, setSessions] = useState([])
-  const [error, setError]       = useState(null)
+    const fetcher = useCallback(() => api.get('/sessions').then(d => d.sessions ?? d), [])
+    const { data: sessions, loading, reload } = useData(fetcher)
 
-  const load = () => api.get('/sessions').then(d => setSessions(d.sessions ?? d)).catch(() => setError('Failed to load sessions.'))
+    const logoutAll = async () => {
+        await api.post('/sessions/logout-all')
+        toast.success('Logged out of all devices.')
+        reload()
+    }
 
-  useEffect(() => { load() }, [])
+    const logoutOthers = async () => {
+        await api.post('/sessions/logout-others')
+        toast.success('Logged out of other devices.')
+        reload()
+    }
 
-  const logoutAll    = async () => { await api.post('/sessions/logout-all');    load() }
-  const logoutOthers = async () => { await api.post('/sessions/logout-others'); load() }
-
-  if (error) return <p className="error">{error}</p>
-
-  return (
-    <div>
-      <h2>Active Sessions</h2>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={logoutOthers}>Logout Other Devices</button>
-        <button className="btn-danger" onClick={logoutAll}>Logout All Devices</button>
-      </div>
-      <table className="data-table">
-        <thead><tr><th>IP Address</th><th>User Agent</th><th>Expires</th></tr></thead>
-        <tbody>
-          {sessions.map(s => (
-            <tr key={s._id}>
-              <td>{s.ipAddress}</td>
-              <td>{s.userAgent}</td>
-              <td>{new Date(s.expiresAt).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+    return (
+        <div className="space-y-4">
+            <h2>Active Sessions</h2>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={logoutOthers}>Logout Other Devices</Button>
+                <Button variant="destructive" onClick={logoutAll}>Logout All Devices</Button>
+            </div>
+            {loading ? (
+                <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow><TableHead>IP Address</TableHead><TableHead>User Agent</TableHead><TableHead>Expires</TableHead></TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {sessions.map(s => (
+                            <TableRow key={s._id}>
+                                <TableCell>{s.ipAddress}</TableCell>
+                                <TableCell className="max-w-xs truncate">{s.userAgent}</TableCell>
+                                <TableCell>{new Date(s.expiresAt).toLocaleString()}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+        </div>
+    )
 }
