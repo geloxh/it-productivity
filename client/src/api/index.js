@@ -8,7 +8,11 @@ const req = (method, path, body) => {
             credentials: 'include',
             headers: body ? { 'Content-Type': 'application/json' } : {},
             ...(body && { body: JSON.stringify(body) })
-    }).then(r => r.json())
+    }).then(async r => {
+        const data = await r.json()
+        if (!r.ok) throw new Error(data.error ?? 'Request failed.')
+        return data
+    })
 }
 
 export const api = {
