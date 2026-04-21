@@ -2,7 +2,7 @@ const Project = require('../models/Project');
 
 exports.create = async (req, res) => {
     try {
-        const project = await Project.create(req.body);
+        const project = await Project.create({ ...req.body, owner: req.user.id });
         res.status(201).json(project);
     } catch (error) {
         res.status(400).json({ error: error.message });

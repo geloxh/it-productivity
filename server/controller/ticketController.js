@@ -2,7 +2,7 @@ const Ticket = require('../models/Ticket');
 
 exports.create = async (req, res) => {
     try {
-        const ticket = await Ticket.create(req.body);
+        const ticket = await Ticket.create({ ...req.body, requester: req.user.id });
         res.status(201).json(ticket);
     } catch (error) {
         res.status(400).json({ error: error.message });

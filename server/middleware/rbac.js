@@ -51,6 +51,8 @@ const PERMISSIONS = {
 
 const checkPermission = (resource, action) => {
     return (req, res, next) => {
+        if (!req.user) return res.status(401).json({ error: { message: 'Unauthorized.' } })
+
         const userRole = req.user.role;
         const permissions = PERMISSIONS[resource]?.[userRole] || [];
 
