@@ -9,13 +9,6 @@ const knowledgeBaseSchema = new mongoose.Schema({
     isPublished: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
     relatedTickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
-    createdAt: { type: Date, default: Date.now },
-    updatedAT: { type: Date, default: Date.now }
-});
-
-knowledgeBaseSchema.pre('save', function(next) {
-    this.updateAT = Date.now();
-    next();
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('KnowledgeBase', knowledgeBaseSchema);

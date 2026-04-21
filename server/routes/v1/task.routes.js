@@ -9,6 +9,6 @@ router.post('/', checkPermission('tasks', 'create'), validate(createTaskSchema),
 router.get('/', checkPermission('tasks', 'read'), taskController.getAll);
 router.get('/:id', checkPermission('tasks', 'read'), taskController.getById);
 router.put('/:id', checkPermission('tasks', 'update'), validate(updateTaskSchema), taskController.update);
-router.delete('/:id', checkPermission('tasks', 'delete'), taskController.delete);
+router.delete('/:id', checkPermission('tasks', 'delete'), taskController.remove);
 
 module.exports = router;

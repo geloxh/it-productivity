@@ -7,6 +7,6 @@ router.post('/', checkPermission('knowledgeBase', 'create'), knowledgeBaseContro
 router.get('/', checkPermission('knowledgeBase', 'read'), knowledgeBaseController.getAll);
 router.get('/:id', checkPermission('knowledgeBase', 'read'), knowledgeBaseController.getById);
 router.put('/:id', checkPermission('knowledgeBase', 'update'), knowledgeBaseController.update);
-router.delete('/:id', checkPermission('knowledgeBase', 'delete'), knowledgeBaseController.delete);
+router.delete('/:id', checkPermission('knowledgeBase', 'delete'), knowledgeBaseController.remove);
 
 module.exports = router;

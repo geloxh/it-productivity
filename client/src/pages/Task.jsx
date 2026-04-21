@@ -26,6 +26,7 @@ export default function Tasks() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (!form.project) return toast.error('Please select a project.')
         setSaving(true)
         try {
             await api.post('/tasks', form)

@@ -38,7 +38,7 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const ticket = await Ticket.findByIdAndDelete(req.params.id);
         if (!ticket) return res.status(404).json({ error: 'Ticket not found.' });

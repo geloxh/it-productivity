@@ -38,10 +38,10 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const kb = await KnowledgeBase.findByIdAndDelete(req.params.id);
-        if (!kb) return res.status(404).json({ error: 'Knosledge base not found.' });
+        if (!kb) return res.status(404).json({ error: 'Knowledge base not found.' });
         res.json({ message: 'Knowledge base deleted.' });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -9,6 +9,6 @@ router.post('/', checkPermission('tickets', 'create'), validate(createTicketSche
 router.get('/', checkPermission('tickets', 'read'), ticketController.getAll);
 router.get('/:id', checkPermission('tickets', 'read'), ticketController.getById);
 router.put('/:id', checkPermission('tickets', 'update'), validate(updateTicketSchema), ticketController.update);
-router.delete('/:id', checkPermission('tickets', 'delete'), ticketController.delete);
+router.delete('/:id', checkPermission('tickets', 'delete'), ticketController.remove);
 
 module.exports = router;
