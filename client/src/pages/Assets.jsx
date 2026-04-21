@@ -11,37 +11,57 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 
 const CATEGORIES = ['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Software', 'Mobile']
+const STATUSES = ['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost']
 const EMPTY = { name: '', assetTag: '', category: 'Laptop', manufacturer: '', model: '', serialNumber: '' }
 const STATUS_VARIANT = { Available: 'secondary', Assigned: 'default', Maintenance: 'outline', Retired: 'secondary', Lost: 'destructive' }
 
 export default function Assets() {
     const fetcher = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
-    const { data: assets, loading, reload } = useData(fetcher)
+    const { data: assets = [], loading, reload } = useData(fetcher)  // fix #5: default []
     const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
+    const [saving, setSaving] = useState(false)                       // fix #6: saving state
+    const [search, setSearch] = useState('')                          // fix #2: search state
 
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
+    // fix #1: handleSubmit properly closed, handleDelete at component scope
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const res = await api.post('/assets', form)
-        if (res.error) return toast.error(res.error)
-        toast.success('Asset added.')
-        setForm(EMPTY)
-        setShowForm(false)
-        reload()
+        setSaving(true)
+        try {
+            const res = await api.post('/assets', form)
+            if (res.error) return toast.error(res.error)
+            toast.success('Asset added.')
+            setForm(EMPTY)
+            setShowForm(false)
+            reload()
+        } catch (err) {
+            toast.error(err.message)
+        } finally {
+            setSaving(false)
+        }
     }
 
     const handleDelete = async (id) => {
-        const prev = assets
-        setAssets(a => a.filter(x => x.id !== id))
         const res = await api.delete(`/assets/${id}`)
-        if (res.error) {
-            setAssets(prev)
-            return toast.error(res.error)
-        }
+        if (res.error) return toast.error(res.error)
         toast.success('Asset deleted.')
+        reload()
     }
+
+    // fix #3: inline status update
+    const handleStatusChange = async (id, status) => {
+        const res = await api.patch(`/assets/${id}`, { status })
+        if (res.error) return toast.error(res.error)
+        reload()
+    }
+
+    // fix #2: filtered list
+    const filtered = assets.filter(a =>
+        a.name.toLowerCase().includes(search.toLowerCase()) ||
+        a.assetTag.toLowerCase().includes(search.toLowerCase())
+    )
 
     return (
         <div className="space-y-4">
@@ -63,9 +83,12 @@ export default function Assets() {
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                     </Select>
-                    <Button type="submit">Save Asset</Button>
+                    <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
                 </form>
             )}
+
+            {/* fix #2: search bar */}
+            <Input placeholder="Search by name or tag..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
 
             {loading ? (
                 <div className="space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
@@ -73,21 +96,34 @@ export default function Assets() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Name</TableHead><TableHead>Tag</TableHead><TableHead>Category</TableHead>
-                            <TableHead>Manufacturer</TableHead><TableHead>Model</TableHead>
+                            <TableHead>Name</TableHead><TableHead>Tag</TableHead><TableHead>Serial No.</TableHead>
+                            <TableHead>Category</TableHead><TableHead>Manufacturer</TableHead><TableHead>Model</TableHead>
                             <TableHead>Status</TableHead><TableHead></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {assets.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No assets found.</TableCell></TableRow>}
-                        {assets.map(a => (
+                        {filtered.length === 0 && (
+                            <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">No assets found.</TableCell></TableRow>
+                        )}
+                        {filtered.map(a => (
                             <TableRow key={a._id}>
                                 <TableCell>{a.name}</TableCell>
                                 <TableCell><code>{a.assetTag}</code></TableCell>
+                                <TableCell>{a.serialNumber || '—'}</TableCell>  {/* fix #4: serial column */}
                                 <TableCell>{a.category}</TableCell>
                                 <TableCell>{a.manufacturer}</TableCell>
                                 <TableCell>{a.model || '—'}</TableCell>
-                                <TableCell><Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge></TableCell>
+                                <TableCell>
+                                    {/* fix #3: inline status change */}
+                                    <Select value={a.status} onValueChange={v => handleStatusChange(a._id, v)}>
+                                        <SelectTrigger className="w-32 h-7">
+                                            <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
                                 <TableCell>
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -107,4 +143,4 @@ export default function Assets() {
             )}
         </div>
     )
-} 
+}
