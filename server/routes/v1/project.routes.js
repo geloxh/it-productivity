@@ -9,6 +9,6 @@ router.post('/', checkPermission('projects', 'create'), validate(createProjectSc
 router.get('/', checkPermission('projects', 'read'), projectController.getAll);
 router.get('/:id', checkPermission('projects', 'read'), projectController.getById);
 router.put('/:id', checkPermission('projects', 'update'), validate(updateProjectSchema), projectController.update);
-router.delete('/:id', checkPermission('projects', 'delete'), projectController.delete);
+router.delete('/:id', checkPermission('projects', 'delete'), projectController.remove);
 
 module.exports = router;

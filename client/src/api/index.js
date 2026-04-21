@@ -10,7 +10,7 @@ const req = (method, path, body) => {
         ...(body && { body: JSON.stringify(body) })
     }).then(async r => {
         const data = await r.json()
-        if (!r.ok) throw new Error(data.message ?? data.error ?? 'Request failed')
+        if (!r.ok) throw new Error(data.message ?? data.error?.message ?? data.error ?? 'Request failed')
         return data
     })
 }

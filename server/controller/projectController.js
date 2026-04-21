@@ -5,6 +5,7 @@ exports.create = async (req, res) => {
         const project = await Project.create({ ...req.body, owner: req.user.id });
         res.status(201).json(project);
     } catch (error) {
+        console.log('CREATE ERROR:', error.message); // add this
         res.status(400).json({ error: error.message });
     }
 };
@@ -38,7 +39,7 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const project = await Project.findByIdAndDelete(req.params.id);
         if (!project) return res.status(404).json({ error: "Project not found." });
