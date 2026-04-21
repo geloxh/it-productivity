@@ -11,7 +11,7 @@ export function useData (fetcher) {
         fetcher()
             .then(d => { if (!cancelled) setData(d) })
             .catch(() => { if (!cancelled) setError('Failed to load data.') })
-            .finally(() => { if (!cancelled) setError('Failed to load data.') })
+            .finally(() => { if (!cancelled) setLoading(false) })
         
         return () => { cancelled = true }
     }, [fetcher])

@@ -17,15 +17,14 @@ const STATUS_VARIANT = { Available: 'secondary', Assigned: 'default', Maintenanc
 
 export default function Assets() {
     const fetcher = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
-    const { data: assets = [], loading, reload } = useData(fetcher)  // fix #5: default []
+    const { data: assets = [], loading, reload } = useData(fetcher)  
     const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
-    const [saving, setSaving] = useState(false)                       // fix #6: saving state
-    const [search, setSearch] = useState('')                          // fix #2: search state
+    const [saving, setSaving] = useState(false)                       
+    const [search, setSearch] = useState('')                        
 
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
-    // fix #1: handleSubmit properly closed, handleDelete at component scope
     const handleSubmit = async (e) => {
         e.preventDefault()
         setSaving(true)
@@ -50,14 +49,12 @@ export default function Assets() {
         reload()
     }
 
-    // fix #3: inline status update
     const handleStatusChange = async (id, status) => {
         const res = await api.patch(`/assets/${id}`, { status })
         if (res.error) return toast.error(res.error)
         reload()
     }
 
-    // fix #2: filtered list
     const filtered = assets.filter(a =>
         a.name.toLowerCase().includes(search.toLowerCase()) ||
         a.assetTag.toLowerCase().includes(search.toLowerCase())
@@ -87,7 +84,6 @@ export default function Assets() {
                 </form>
             )}
 
-            {/* fix #2: search bar */}
             <Input placeholder="Search by name or tag..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
 
             {loading ? (
@@ -114,7 +110,6 @@ export default function Assets() {
                                 <TableCell>{a.manufacturer}</TableCell>
                                 <TableCell>{a.model || '—'}</TableCell>
                                 <TableCell>
-                                    {/* fix #3: inline status change */}
                                     <Select value={a.status} onValueChange={v => handleStatusChange(a._id, v)}>
                                         <SelectTrigger className="w-32 h-7">
                                             <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
