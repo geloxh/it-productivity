@@ -1,15 +1,15 @@
 const { z } = require('zod');
 
 const createTicketSchema = z.object({
-    title: z.string().min(5).max(200),
-    description: z.string().min(10),
+    title: z.string().min(3).max(200),
+    description: z.string().min(1),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical']).optional(),
     relatedAsset: z.string().optional()
 });
 
 const updateTicketSchema = z.object({
-    title: z.string().min(5).max(200).optional(),
-    description: z.string().min(10).optional(),
+    title: z.string().min(3).max(200).optional(),
+    description: z.string().min(1).optional(),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical']).optional(),
     status: z.enum(['Open', 'In-Progress', 'Resolved', 'Closed']).optional(),
     assignedTo: z.string().optional()
