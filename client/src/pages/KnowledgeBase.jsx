@@ -5,16 +5,20 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 
 const CATEGORIES = ['Hardware', 'Software', 'Network', 'Security', 'General']
+const EMPTY = { title: '', content: '', category: 'General' }
 
 export default function KnowledgeBase() {
     const fetcher = useCallback(() => api.get('/knowledge-base').then(d => d.articles ?? d), [])
     const { data: articles, loading, reload } = useData(fetcher)
     const [form, setForm] = useState({ title: '', content: '', category: 'General' })
+    const [showForm, setShowForm] = useState(false)
+    
 
     const submit = async (e) => {
         e.preventDefault()
