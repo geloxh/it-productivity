@@ -14,7 +14,7 @@ export default function Navbar() {
 
     return (
         <header className="navbar">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <span className="text-sm text-muted-foreground" style={{ flex: 1 }}>{user?.email}</span>
             <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut size={14} /> Logout
             </Button>
