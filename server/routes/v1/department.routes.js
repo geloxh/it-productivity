@@ -7,6 +7,6 @@ router.post('/', checkPermission('departments', 'create'), departmentController.
 router.get('/', checkPermission('departments', 'read'), departmentController.getAll);
 router.get('/:id', checkPermission('departments', 'read'), departmentController.getById);
 router.put('/:id', checkPermission('departments', 'update'), departmentController.update);
-router.delete('/:id', checkPermission('departments', 'delete'), departmentController.delete);
+router.delete('/:id', checkPermission('departments', 'delete'), departmentController.remove);
 
 module.exports = router;

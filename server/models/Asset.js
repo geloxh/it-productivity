@@ -26,7 +26,7 @@ const assetSchema = new mongoose.Schema({
     specifications: { type: Map, of: String }, // Flexible Object for RAM, CPU, etc.
     createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
-assetSchema.index({ assetTag: 1 })
+
 assetSchema.index({ status: 1, category: 1 })
 
 module.exports = mongoose.model('Asset', assetSchema);

@@ -38,7 +38,7 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const department = await Department.findByIdAndDelete(req.params.id);
         if (!department) return res.status(404).json({ error: 'Department not found' });
@@ -46,4 +46,4 @@ exports.delete = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};

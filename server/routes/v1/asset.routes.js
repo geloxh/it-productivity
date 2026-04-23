@@ -9,6 +9,6 @@ router.post('/', checkPermission('assets', 'create'), validate(createAssetSchema
 router.get('/', checkPermission('assets', 'read'), assetController.getAll);
 router.get('/:id', checkPermission('assets', 'read'), assetController.getById);
 router.put('/:id', checkPermission('assets', 'update'), validate(updateAssetSchema), assetController.update);
-router.delete('/:id', checkPermission('assets', 'delete'), assetController.delete);
+router.delete('/:id', checkPermission('assets', 'delete'), assetController.remove);
 
 module.exports = router;

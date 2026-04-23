@@ -8,6 +8,6 @@ const userController = require('../../controller/userController');
 router.get('/', checkPermission('users', 'read'), userController.getAll);
 router.get('/:id', checkPermission('users', 'read'), userController.getById);
 router.put('/:id', checkPermission('users', 'update'), validate(updateUserSchema), userController.update);
-router.delete('/:id', checkPermission('users', 'delete'), userController.delete);
+router.delete('/:id', checkPermission('users', 'delete'), userController.remove);
 
 module.exports = router;

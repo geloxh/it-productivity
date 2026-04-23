@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
     try {
         const users = await User.find().populate('department');
-        res.json(user);
+        res.json(users);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -37,7 +37,7 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) return res.status(404).json({ error: 'User not found'});

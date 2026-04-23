@@ -38,7 +38,7 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+exports.remove = async (req, res) => {
     try {
         const asset= await Asset.findByIdAndDelete(req.params.id);
         if (!asset) return res.status(404).json({ error: 'Asset not found' });

@@ -2,12 +2,12 @@ const KnowledgeBase = require('../models/KnowledgeBase');
 
 exports.create = async (req, res) => {
     try {
-        const kb = await KnowledgeBase.create(req.body);
+        const kb = await KnowledgeBase.create({ ...req.body, author: req.user.id });
         res.status(201).json(kb);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-}
+};
 
 exports.getAll = async (req, res) => {
     try {
