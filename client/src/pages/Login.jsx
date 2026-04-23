@@ -26,15 +26,15 @@ export default function Login() {
                 <div className="auth-branding">
                     <div className="auth-branding-inner">
                         <div className="auth-logo">⚙️</div>
-                        <h1 className="auth-brand-title">IT Productivity System</h1>
-                        <p className="auth-brand-sub">Manage assets, tickets, projects and your team - all in one place.</p>
+                        <h1 className="auth-brand-title">IT Productivity</h1>
+                        <p className="auth-brand-sub">Manage assets, tickets, projects, and your team — all in one place.</p>
                     </div>
                 </div>
                 <div className="auth-form-panel">
                     <form className="auth-form" onSubmit={handleSubmit}>
                         <div className="auth-form-header">
-                            <h2>Welcome back.</h2>
-                            <p className="auth-form-desc">Sign in to your account to continue.</p>
+                            <h2>Welcome back</h2>
+                            <p className="auth-form-desc">Sign in to your account to continue</p>
                         </div>
                         {error && <p className="error">{error}</p>}
                         <div className="auth-field">

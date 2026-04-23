@@ -14,7 +14,6 @@ export default function Register() {
         e.preventDefault()
         setError('')
         setLoading(true)
-
         try {
             const data = await authApi.register(form)
             if (data.user) navigate('/login')
@@ -30,11 +29,11 @@ export default function Register() {
 
     return (
         <div className="auth-page">
-           <div className="auth-panel">
+            <div className="auth-panel">
                 <div className="auth-branding">
                     <div className="auth-branding-inner">
                         <div className="auth-logo">⚙️</div>
-                        <h1 className="auth-brand-title">IT Productivity System</h1>
+                        <h1 className="auth-brand-title">IT Productivity</h1>
                         <p className="auth-brand-sub">Join your team and start managing IT resources efficiently.</p>
                     </div>
                 </div>
@@ -69,7 +68,7 @@ export default function Register() {
                         <p className="auth-switch">Already have an account? <Link to="/login">Sign in</Link></p>
                     </form>
                 </div>
-           </div>
+            </div>
         </div>
     )
 }
