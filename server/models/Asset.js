@@ -10,23 +10,39 @@ const assetSchema = new mongoose.Schema({
         enum: ['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Software', 'Mobile'],
         required: true
     },
-    manufacturer: { type: String },
+    manufacturer: { type: String },  
     model: { type: String },
+    deviceYearModel: { type: String },
+    systemInfo: { type: String },   
 
     status: {
         type: String,
         enum: ['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost'],
         default: 'Available'
     },
+    equipmentStatus: {
+        type: String,
+        enum: ['Good', 'Defective', 'For Repair', 'For Disposal'],
+        default: 'Good'
+    },
+    contractStatus: {
+        type: String,
+        enum: ['Active', 'Expired', 'None'],
+        default: 'None'
+    },
 
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    user: { type: String },         
+    formerUser: { type: String },
+    company: { type: String },
 
+    dateAcquired: { type: Date },
     purchaseDate: { type: Date },
     warrantyExpiry: { type: Date },
-    specifications: { type: Map, of: String }, // Flexible Object for RAM, CPU, etc.
-    createdAt: { type: Date, default: Date.now }
+    notes: { type: String },
+    specifications: { type: Map, of: String },
 }, { timestamps: true });
 
-assetSchema.index({ status: 1, category: 1 })
+assetSchema.index({ status: 1, category: 1 });
 
 module.exports = mongoose.model('Asset', assetSchema);

@@ -35,3 +35,25 @@ project/
 │   └── server.js       # Entry Point
 ├── docs/               # Documentation
 └── README.md           # Main Project Info File
+
+
+### Assets
+user (string, current user/assignee name)
+
+systemInfo (string, OS/specs summary)
+
+deviceYearModel (number/string)
+
+formerUser (string)
+
+contractStatus (enum)
+
+dateAcquired (Date, replaces/supplements purchaseDate)
+
+equipmentStatus (enum, more specific than status)
+
+notes (string)
+
+company (string)
+
+brand → already manufacturer, just rename display
