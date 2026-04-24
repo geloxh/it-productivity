@@ -25,13 +25,13 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/public" element={<Landing />} />
+            <Route path="/submit-ticket" element={<SubmitTicket />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/assets" element={<Assets />} />
                 <Route path="/tickets" element={<Tickets />} />
-                <Route path="/submit-ticket" element={<SubmitTicket />} />
-                <Route path="/public" element={<Landing />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/tasks" element={<Task />} />
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
