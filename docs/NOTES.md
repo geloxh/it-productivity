@@ -8,11 +8,20 @@ Personal Project to build a progressive, maintainable, scalable web and app IT p
 - Deployment : ?
 
 ## PROJECT FEATURES
-- User Authentication : Register, Login, Logout
-- Devices Management : Add, Remove, Update, and View IT devices such as servers, networks, storage, and applications.
-- Alerts and Notifications : Receive alerts and notifications for IT resource issues.
-- Dashboards and Reports : View dashboards and reports for IT resource performance and usage.
-- Employee Management : Add, Remove, Update, and View employee information.
+- ***User Process***
+- **User Authentication** : Register, Login, Logout
+- **Devices Management** : Add, Remove, Update, and View IT assets (Desktop, Laptop, AIO & Peripherals)
+- **Alerts and Notifications** : Receive alerts and notifications for IT resource issues.
+- **Dashboards and Reports** : View dashboards and reports for IT resource performance and usage.
+- **Activity Log** : View process/activity log
+- **Employee Management** : Add, Remove, Update, and View employee information.
+- **Ticket Management**: Add, Remove, Update, and View tickets.
+- **Knowledge Base** : Add, Remove, Update, and View knowledge base entries.
+- **Project Management** : Add, Remove, Update, and View projects.
+- **Tasks Management** : Add, Remove, Update, and View tasks.
+- **View Sessions** (Display devies where users singin & out in the system)
+- **View Users of the system**
+
 
 ## FUTURE ENHANCEMENTS
 - Resource Monitoring : Monitor IT resources such as servers, networks, storage, and applications.
