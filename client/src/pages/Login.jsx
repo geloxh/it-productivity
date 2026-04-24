@@ -50,6 +50,9 @@ export default function Login() {
                         </Button>
                         <p className="auth-switch">No account? <Link to="/register">Create one</Link></p>
                     </form>
+                    <p className="auth-ticket-link">
+                        Need support? <a href="/submit-ticket">Submit a ticket</a>
+                    </p>
                 </div>
             </div>
         </div>

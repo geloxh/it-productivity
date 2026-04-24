@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
@@ -75,13 +76,15 @@ export default function Assets() {
         <div className="space-y-4">
             <div className="page-header">
                 <h2>Assets</h2>
-                <Button variant={showForm ? 'outline' : 'default'} onClick={() => setShowForm(v => !v)}>
-                    {showForm ? 'Cancel' : '+ Add Asset'}
-                </Button>
+                <Button onClick={() => setShowForm(true)}>+ Add Asset</Button>
             </div>
 
-            {showForm && (
-                <form className="asset-form" onSubmit={handleSubmit}>
+            <Dialog open={showForm} onOpenChange={setShowForm}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                    <DialogTitle>Add Asset</DialogTitle>
+                    </DialogHeader>
+                    <form className="asset-form" onSubmit={handleSubmit}>
                     <Input placeholder="Asset Tag *" value={form.assetTag} onChange={set('assetTag')} required />
                     <Input placeholder="User" value={form.user} onChange={set('user')} />
                     <Select value={form.category} onValueChange={setVal('category')}>
@@ -98,7 +101,7 @@ export default function Assets() {
                         <SelectTrigger><SelectValue placeholder="Contract Status" /></SelectTrigger>
                         <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
-                    <Input type="date" placeholder="Date Acquired" value={form.dateAcquired} onChange={set('dateAcquired')} />
+                    <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
                     <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
                         <SelectTrigger><SelectValue placeholder="Equipment Status" /></SelectTrigger>
                         <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
@@ -107,8 +110,9 @@ export default function Assets() {
                     <Input placeholder="Name / Label *" value={form.name} onChange={set('name')} required />
                     <Input placeholder="Notes" value={form.notes} onChange={set('notes')} />
                     <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
-                </form>
-            )}
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <Input placeholder="Search by name, tag, user, serial..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
 

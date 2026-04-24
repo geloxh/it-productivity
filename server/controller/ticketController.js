@@ -9,6 +9,16 @@ exports.create = async (req, res) => {
     }
 };
 
+exports.publicCreate = async (req, res) => {
+    try {
+        const { title, description, priority, guestName, guestEmail } = req.body;
+        const ticket = await Ticket.create({ title, description, priority, guestName, guestEmail });
+        res.status(201).json(ticket);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 exports.getAll = async (req, res) => {
     try {
         const tickets = await Ticket.find().populate('requester assignedTo relatedAsset');

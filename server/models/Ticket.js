@@ -5,7 +5,9 @@ const ticketSchema = new mongoose.Schema({
     description: { type: String, required: true },
     priority: { type: String, enum: ['Low', 'Medium', 'High', 'Critical'], default: 'Low' },
     status: { type: String, enum: ['Open', 'In-Progress', 'Resolved', 'Closed'], default: 'Open' },
-    requester: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    requester: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    guestName: { type: String },
+    guestEmail: { type: String },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     relatedAsset: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset' },
     comments: [{
