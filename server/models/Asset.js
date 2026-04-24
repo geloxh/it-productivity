@@ -14,6 +14,7 @@ const assetSchema = new mongoose.Schema({
         ],
         required: true
     },
+
     inclusions : {
         type: String,
         enum: [
@@ -27,6 +28,7 @@ const assetSchema = new mongoose.Schema({
             'MONITOR'
         ]
     },
+
     manufacturer: { // brand
         type: String,
         enum: [
@@ -44,7 +46,8 @@ const assetSchema = new mongoose.Schema({
             'HUNTKEY',
             'ASUS'
         ]
-    },  
+    },
+
     model: { 
         type: String,
         enum: [
@@ -64,6 +67,7 @@ const assetSchema = new mongoose.Schema({
             '83K0'
         ]
     },
+
     deviceYearModel: { type: String },
     systemInfo: { 
         type: String,
@@ -81,6 +85,7 @@ const assetSchema = new mongoose.Schema({
         enum: ['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost'],
         default: 'Available'
     },
+
     equipmentStatus: {
         type: String,
         enum: [
@@ -92,15 +97,30 @@ const assetSchema = new mongoose.Schema({
         ],
         default: 'Good'
     },
+
     contractStatus: {
         type: String,
         enum: ['Active', 'Resigned', 'Awol', 'Terminated'],
         default: 'None'
     },
 
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-    user: { type: String },         
+    assignedTo: { 
+        ref: { type: String, enum: ['User', 'Employee'] },
+        entityId: { type: mongoose.Schema.Types.ObjectId, refPath: 'assignedTo.ref' }
+    },
+
+    assignmentHistory: [{
+        user:       { type: mongoose.Schema.Types.ObjectId, refPath: 'assignmentHistory.userModel' },
+        userModel:  { type: String, enum: ['User', 'Employee'] },
+        assignedAt: { type: Date, default: Date.now },
+        returnedAt: { type: Date, default: null },
+        notes:      { type: String }
+    }], 
+
+    user: { type: String },
+
     formerUser: { type: String },
+    
     company: { 
         type: String,
         enum: ['SPK', '3E', 'PowerNet', 'NORM' ]
