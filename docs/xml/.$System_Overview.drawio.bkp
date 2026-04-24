@@ -130,7 +130,7 @@
             <mxPoint x="695" y="780" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="0SRuJ_km5dIE0c_fwmT1-34" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#e51400;fontColor=#ffffff;strokeColor=#B20000;" value="END/Continue Session" vertex="1">
+        <mxCell id="0SRuJ_km5dIE0c_fwmT1-34" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#e51400;fontColor=#ffffff;strokeColor=#B20000;" value="" vertex="1">
           <mxGeometry height="70" width="155" x="442.5" y="950" as="geometry" />
         </mxCell>
       </root>
