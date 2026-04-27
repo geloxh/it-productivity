@@ -7,7 +7,14 @@ import { Eye, EyeOff } from 'lucide-react'
 
 export default function Register() {
     const navigate = useNavigate()
-    const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' })
+    const [form, setForm] = useState({ 
+        firstName: '', 
+        lastName: '', 
+        email: '',
+        username: '', 
+        password: '',
+        confirmPassword: '' 
+    })
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [showPass, setShowPass] = useState(false)
@@ -15,9 +22,15 @@ export default function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('')
+
+        if (form.password !== form.confirmPassword) {
+            setError('Passwords do not match.')
+            return
+        }
+
         setLoading(true)
         try {
-            const data = await authApi.register(form)
+            const data = await authApi.register(submitData)
             if (data.user) navigate('/login')
             else setError(data.error?.message || data.message || 'Registration failed.')
         } catch {
@@ -75,6 +88,10 @@ export default function Register() {
                                 <Input type="email" placeholder="you@company.com" value={form.email} onChange={set('email')} required />
                             </div>
                             <div className="auth-field">
+                                <label>Username</label>
+                                <Input type="text" placeholder="johndoe" value={form.username} onChange={set('username')} required />
+                            </div>
+                            <div className="auth-field">
                                 <label>Password</label>
                                 <div className="auth-pass-wrap">
                                     <Input
@@ -82,6 +99,21 @@ export default function Register() {
                                         placeholder="••••••••"
                                         value={form.password}
                                         onChange={set('password')}
+                                        required
+                                    />
+                                    <button type="button" className="auth-show-pass" onClick={() => setShowPass(v => !v)}>
+                                        {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="auth-field">
+                                <label>Confirm Password</label>
+                                <div className="auth-pass-wrap">
+                                    <Input
+                                        type={showPass ? 'text' : 'password'}
+                                        placeholder="••••••••"
+                                        value={form.confirmPassword}
+                                        onChange={set('confirmPassword')}
                                         required
                                     />
                                     <button type="button" className="auth-show-pass" onClick={() => setShowPass(v => !v)}>
