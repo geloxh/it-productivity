@@ -8,9 +8,13 @@ const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Assets = lazy(() => import('./pages/Assets'))
+
 const Tickets = lazy(() => import('./pages/Tickets'))
 const SubmitTicket = lazy(() => import('./pages/SubmitTicket'))
 const Landing = lazy(() => import('./pages/Landing'))
+
+const PublicOnlyRoute = lazy(() => import('./components/PublicOnlyRoute'))
+
 const Projects = lazy(() => import('./pages/Projects'))
 const Task = lazy(() => import('./pages/Task'))
 const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase'))
@@ -27,6 +31,12 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/public" element={<Landing />} />
             <Route path="/submit-ticket" element={<SubmitTicket />} />
+
+            <Route element={<PublicOnlyRoute />}>
+              <Route path="/public" element={<Landing />} />
+              <Route path="/submit-ticket" element={<SubmitTicket />} />
+            </Route>
+            
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/" element={<Dashboard />} />

@@ -27,9 +27,6 @@ export default function Navbar() {
             <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut size={14} /> Logout
             </Button>
-            <a href="/submit-ticket" target="_blank" style={{ fontSize: '14px', color: '#666' }}>
-                Public Ticket Form
-            </a>
         </header>
     )
 }
