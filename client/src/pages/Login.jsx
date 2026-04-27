@@ -8,7 +8,7 @@ import { Eye, EyeOff } from 'lucide-react'
 export default function Login() {
     const { login } = useAuth()
     const navigate = useNavigate()
-    const [form, setForm] = useState({ email: '', password: '' })
+    const [form, setForm] = useState({ identifier: '', password: '' })
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [showPass, setShowPass] = useState(false)
@@ -56,8 +56,8 @@ export default function Login() {
                             </div>
                             {error && <p className="error">{error}</p>}
                             <div className="auth-field">
-                                <label>Email Address</label>
-                                <Input type="email" placeholder="user@company.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+                                <label>Email or Username</label>
+                                <Input type="text" placeholder="user@company.com or username" value={form.identifier} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
                             </div>
                             <div className="auth-field">
                                 <label>Password</label>

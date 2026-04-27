@@ -15,8 +15,12 @@ const register = async (userData, req) => {
     return { user: { id: user._id, email: user.email, role: user.role }, token };
 };
 
-const login = async (email, password, req) => {
-    const user = await User.findOne({ email });
+const login = async (identifier, password, req) => {
+    const user = await User.findOne({ 
+        $or: [{ email: identifier }, { username: identifier }]
+
+    }).select('+password');
+
     if (!user || !(await user.comparePassword(password))) {
         throw new Error('Invalid credentials');
     }
@@ -28,7 +32,7 @@ const login = async (email, password, req) => {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await createSession(user._id, token, expiresAt, req);
 
-    return { user: { id: user._id, email: user.email, role: user.role }, token };
+    return { user: { id: user._id, email: user.email, username: user.username, role: user.role }, token };
 };
 
 module.exports = { register, login };

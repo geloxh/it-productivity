@@ -20,8 +20,8 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        const { user, token } = await login(email, password, req);
+        const { identifier, password } = req.body;
+        const { user, token } = await login(identifier, password, req);
 
         res.cookie('token', token, {
             httpOnly: true,
