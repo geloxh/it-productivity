@@ -444,6 +444,7 @@ code {
 }
 
 .auth-form-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+
 .auth-form-header h2 { font-size: 18px; color: #0c4a6e; margin: 0; }
 
 .auth-form-desc {
@@ -484,7 +485,17 @@ code {
 }
 
 .auth-pass-wrap { position: relative; }
+
 .auth-pass-wrap input { padding-right: 36px; width: 100%; }
+
+.auth-row {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-row .auth-field {
+  flex: 1;
+}
 
 .auth-show-pass {
     position: absolute;
@@ -525,6 +536,7 @@ code {
     font-family: var(--mono);
 }
 .auth-switch a { color: #0284c7; font-weight: 500; text-decoration: none; }
+
 .auth-switch a:hover { color: #0369a1; text-decoration: underline; }
 
 .auth-statusbar {
