@@ -57,7 +57,12 @@ export default function Login() {
                             {error && <p className="error">{error}</p>}
                             <div className="auth-field">
                                 <label>Email or Username</label>
-                                <Input type="text" placeholder="user@company.com or username" value={form.identifier} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+                                <Input 
+                                    type="text" placeholder="user@company.com or username" 
+                                    value={form.identifier} 
+                                    onChange={e => setForm(f => ({ ...f, identifier: e.target.value }))} 
+                                    required
+                                />
                             </div>
                             <div className="auth-field">
                                 <label>Password</label>

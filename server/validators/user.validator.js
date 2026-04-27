@@ -4,6 +4,7 @@ const registerSchema = z.object({
     firstName: z.string().min(2).max(50),
     lastName: z.string().min(2).max(50),
     email: z.string().email(),
+    username: z.string().min(3).max(30),
     password: z.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
     role: z.enum(['SysAdmin', 'Admin', 'Employee', 'Guest']).optional(),
     employeeId: z.string().optional(),
@@ -12,7 +13,7 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-    email: z.string().email(),
+    identifier: z.string().min(1),
     password: z.string().min(1)
 });
 

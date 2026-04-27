@@ -16,14 +16,14 @@ const COOKIE_OPTIONS = {
 
 router.post('/register', authLimiter, async (req, res, next) => {
   try {
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, username, password, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: { message: 'User already exists' } });
     }
 
-    const user = await User.create({ firstName, lastName, email, password, role });
+    const user = await User.create({ firstName, lastName, email, username, password, role });
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await createSession(user._id, token, expiresAt, req);

@@ -30,6 +30,10 @@ export default function Register() {
 
         setLoading(true)
         try {
+            const {
+                confirmPassword, ...submitData
+            } = form
+            
             const data = await authApi.register(submitData)
             if (data.user) navigate('/login')
             else setError(data.error?.message || data.message || 'Registration failed.')
