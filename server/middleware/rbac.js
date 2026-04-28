@@ -29,9 +29,9 @@ const PERMISSIONS = {
 
     assets: {
         SysAdmin: ['create', 'read', 'update', 'delete'],
-        Admin: ['create', 'update:department'],
-        Employee: ['read'],
-        Guest: []
+        Admin: ['create', 'read', 'update', 'delete'],
+        Employee: ['read', 'update'],
+        Guest: ['read']
     },
 
     departments: {

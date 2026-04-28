@@ -71,11 +71,11 @@ function InlineCell({ value, onSave, type = 'text', options }) {
         autoFocus
         className="inline-cell-select"
         value={val}
-        onChange={e => setVal(e.target.value)}
-        onBlur={commit}
-      >
+        onChange={e => { setVal(e.target.value); setEditing(false); if (e.target.value !== value) onSave(e.target.value) }}
+        onBlur={() => setEditing(false)}
+        >
         {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
+    </select>
     )
     return (
       <input
