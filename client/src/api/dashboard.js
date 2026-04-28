@@ -8,4 +8,6 @@ export const dashboardApi = {
     getProjects: () => get('/projects'),
     getTasks: () => get('/tasks'),
     getTimeSeries: () => get('/timeseries'),
+    getWidgets: () => get('/widgets'),
+    getHealth: () => fetch('/api/v1/health', { credentials: 'include' }).then(r => r.json()).catch(() => ({ ok: false }))
 }

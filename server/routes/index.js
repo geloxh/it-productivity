@@ -15,6 +15,8 @@ const departmentRoutes = require('./v1/department.routes');
 const knowledgeBaseRoutes = require('./v1/knowledgeBase.routes');
 const dashboardRoutes = require('./v1/dashboard.routes');
 
+router.get('/v1/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 router.use('/v1/auth', authRoutes);
 router.use('/v1/users', authenticate, userRoutes);
 router.use('/v1/tickets', authenticate, ticketRoutes);

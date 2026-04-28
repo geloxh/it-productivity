@@ -27,6 +27,37 @@ exports.getOverview = async (req, res) => {
     }
 };
 
+exports.getWidgets = async (req, res) => {
+    try {
+        const KnowledgeBase = require('../models/KnowledgeBase')
+        const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+        const [recentTickets, overdueTasksRaw, aging3, aging7, announcements] = await Promise.all([
+            Ticket.find({ status: { $in: ['Open', 'In-Progress'] } })
+                .sort({ createdAt: -1 }).limit(5)
+                .select('title priority status createdAt'),
+            Task.find({ dueDate: { $lt: new Date() }, status: { $nin: ['Done'] } })
+                .populate('assignedTo', 'firstName lastName')
+                .select('title dueDate assignedTo priority'),
+            Ticket.countDocuments({ status: { $in: ['Open', 'In-Progress'] }, createdAt: { $lt: threeDaysAgo } }),
+            Ticket.countDocuments({ status: { $in: ['Open', 'In-Progress'] }, createdAt: { $lt: sevenDaysAgo } }),
+            KnowledgeBase.find({ isPublished: true }).sort({ createdAt: -1 }).limit(5).select('title category createdAt'),
+        ])
+
+        const overdueByAssignee = overdueTasksRaw.reduce((acc, t) => {
+            const key = t.assignedTo ? `${t.assignedTo.firstName} ${t.assignedTo.lastName}` : 'Unassigned'
+            if (!acc[key]) acc[key] = []
+            acc[key].push({ title: t.title, dueDate: t.dueDate, priority: t.priority })
+            return acc
+        }, {})
+
+        res.json({ recentTickets, overdueByAssignee, aging: { gt3: aging3, gt7: aging7 }, announcements })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
 // Asset KPIs
 exports.getAssetMetrics = async (req, res) => {
     try {
