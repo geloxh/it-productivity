@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
@@ -18,7 +19,7 @@ export default function Tasks() {
     const taskFetcher = useCallback(() => api.get('/tasks').then(d => d.tasks ?? d), [])
     const projectFetcher = useCallback(() => api.get('/projects').then(d => d.projects ?? d), [])
     const { data: tasks = [], loading: loadingTasks, reload } = useData(taskFetcher)
-    const { data: projects = [], loading: loadingProjects } = useData(projectFetcher)
+    const { data: projects = [] } = useData(projectFetcher)
     const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -56,70 +57,86 @@ export default function Tasks() {
         t.project?.name?.toLowerCase().includes(search.toLowerCase())
     )
 
-    const loading = loadingTasks || loadingProjects
-
     return (
-        <div className="space-y-4">
-            <div className="page-header">
-                <h2>Tasks</h2>
-                <Button variant={showForm ? 'outline' : 'default'} onClick={() => setShowForm(v => !v)}>
-                    {showForm ? 'Cancel' : '+ Add Task'}
-                </Button>
+        <div className="assets-root">
+            <div className="dash-toolbar">
+                <span className="dash-title">Tasks</span>
+                <div className="dash-toolbar-right">
+                    <Input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)} className="assets-search" />
+                    <Button size="sm" onClick={() => setShowForm(true)}>+ Add Task</Button>
+                </div>
             </div>
 
-            {showForm && (
-                <form className="asset-form" onSubmit={handleSubmit}>
-                    <Input placeholder="Title *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
-                    <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))} required>
-                        <SelectTrigger><SelectValue placeholder="Select Project *" /></SelectTrigger>
-                        <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Task'}</Button>
-                </form>
-            )}
+            <Dialog open={showForm} onOpenChange={setShowForm}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Add Task</DialogTitle></DialogHeader>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                        <div className="assets-field">
+                            <label>Title *</label>
+                            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                        </div>
+                        <div className="assets-field">
+                            <label>Project *</label>
+                            <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))} required>
+                                <SelectTrigger><SelectValue placeholder="Select Project" /></SelectTrigger>
+                                <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Priority</label>
+                            <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Task'}</Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
-            <Input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
-
-            {loading ? (
-                <div className="space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
-            ) : (
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Title</TableHead><TableHead>Project</TableHead>
-                            <TableHead>Priority</TableHead><TableHead></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filtered.length === 0 && (
-                            <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No tasks found.</TableCell></TableRow>
-                        )}
-                        {filtered.map(t => (
-                            <TableRow key={t._id}>
-                                <TableCell>{t.title}</TableCell>
-                                <TableCell>{t.project?.name ?? '—'}</TableCell>
-                                <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
-                                <TableCell>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="destructive" size="sm">Delete</Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <p>Delete <strong>{t.title}</strong>? This cannot be undone.</p>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(t._id)}>Delete</AlertDialogAction>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </TableCell>
+            <div className="assets-grid">
+                {loadingTasks ? (
+                    <div className="p-4 space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Title</TableHead><TableHead>Project</TableHead>
+                                <TableHead>Priority</TableHead><TableHead></TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            )}
+                        </TableHeader>
+                        <TableBody>
+                            {filtered.length === 0 && (
+                                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-10">No tasks found.</TableCell></TableRow>
+                            )}
+                            {filtered.map(t => (
+                                <TableRow key={t._id}>
+                                    <TableCell className="font-medium">{t.title}</TableCell>
+                                    <TableCell>{t.project?.name ?? '—'}</TableCell>
+                                    <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
+                                    <TableCell>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="sm">Delete</Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <p>Delete <strong>{t.title}</strong>? This cannot be undone.</p>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(t._id)}>Delete</AlertDialogAction>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </div>
+
+            <div className="dash-statusbar">
+                <span>{filtered.length} task{filtered.length !== 1 ? 's' : ''}{search ? ' (filtered)' : ''}</span>
+                <span>{tasks.length} total</span>
+            </div>
         </div>
     )
 }

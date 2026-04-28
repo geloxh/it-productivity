@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 export default function Sessions() {
     const fetcher = useCallback(() => api.get('/sessions').then(d => d.sessions ?? d), [])
-    const { data: sessions, loading, reload } = useData(fetcher)
+    const { data: sessions = [], loading, reload } = useData(fetcher)
 
     const logoutAll = async () => {
         await api.post('/sessions/logout-all')
@@ -23,30 +23,47 @@ export default function Sessions() {
     }
 
     return (
-        <div className="space-y-4">
-            <h2>Active Sessions</h2>
-            <div className="flex gap-2">
-                <Button variant="outline" onClick={logoutOthers}>Logout Other Devices</Button>
-                <Button variant="destructive" onClick={logoutAll}>Logout All Devices</Button>
+        <div className="assets-root">
+            <div className="dash-toolbar">
+                <span className="dash-title">Active Sessions</span>
+                <div className="dash-toolbar-right">
+                    <Button size="sm" variant="outline" onClick={logoutOthers}>Logout Other Devices</Button>
+                    <Button size="sm" variant="destructive" onClick={logoutAll}>Logout All Devices</Button>
+                </div>
             </div>
-            {loading ? (
-                <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
-            ) : (
-                <Table>
-                    <TableHeader>
-                        <TableRow><TableHead>IP Address</TableHead><TableHead>User Agent</TableHead><TableHead>Expires</TableHead></TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {sessions.map(s => (
-                            <TableRow key={s._id}>
-                                <TableCell>{s.ipAddress}</TableCell>
-                                <TableCell className="max-w-xs truncate">{s.userAgent}</TableCell>
-                                <TableCell>{new Date(s.expiresAt).toLocaleString()}</TableCell>
+
+            <div className="assets-grid">
+                {loading ? (
+                    <div className="p-4 space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>IP Address</TableHead>
+                                <TableHead>User Agent</TableHead>
+                                <TableHead>Expires</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            )}
+                        </TableHeader>
+                        <TableBody>
+                            {sessions.length === 0 && (
+                                <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-10">No active sessions.</TableCell></TableRow>
+                            )}
+                            {sessions.map(s => (
+                                <TableRow key={s._id}>
+                                    <TableCell><code>{s.ipAddress}</code></TableCell>
+                                    <TableCell className="max-w-xs truncate">{s.userAgent}</TableCell>
+                                    <TableCell>{new Date(s.expiresAt).toLocaleString()}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </div>
+
+            <div className="dash-statusbar">
+                <span>{sessions.length} active session{sessions.length !== 1 ? 's' : ''}</span>
+                <span>Session Management</span>
+            </div>
         </div>
     )
 }
