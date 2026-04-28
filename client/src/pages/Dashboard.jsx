@@ -1,71 +1,63 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { dashboardApi } from '../api/dashboard'
 import { api } from '../api/index'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
+import { useData } from '../hooks/useData'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Monitor, Ticket, FolderKanban, CheckSquare, Users, RefreshCw, Circle, Plus } from 'lucide-react'
+import { RefreshCw, Circle, Plus, Monitor, Ticket, FolderKanban, CheckSquare, Users } from 'lucide-react'
 import { toast } from 'sonner'
 
 const STATS = [
-    { key: 'assets', label: 'Assets', icon: Monitor },
-    { key: 'tickets', label: 'Tickets', icon: Ticket },
+    { key: 'assets',   label: 'Assets',   icon: Monitor },
+    { key: 'tickets',  label: 'Tickets',  icon: Ticket },
     { key: 'projects', label: 'Projects', icon: FolderKanban },
-    { key: 'tasks', label: 'Tasks', icon: CheckSquare },
+    { key: 'tasks',    label: 'Tasks',    icon: CheckSquare },
 ]
-const PRIORITY_VARIANT = { Low: 'secondary', Medium: 'outline', High: 'default', Critical: 'destructive' }
-const ASSET_STATUS_COLORS = { Available: '#22c55e', Assigned: '#3b82f6', Maintenance: '#f59e0b', Retired: '#9ca3af', Lost: '#ef4444' }
+
+const PRIORITY_VARIANT = { High: 'destructive', Medium: 'outline', Low: 'secondary', Critical: 'destructive' }
+const ASSET_STATUS_COLORS = { Available: '#22c55e', Assigned: '#3b82f6', Maintenance: '#f59e0b', Retired: '#6b7280', Lost: '#ef4444' }
 
 export default function Dashboard() {
     const navigate = useNavigate()
-    const [data, setData] = useState(null)
-    const [widgets, setWidgets] = useState(null)
-    const [health, setHealth] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [lastSync, setLastSync] = useState(null)
-    const [quickAction, setQuickAction] = useState(null) // 'ticket' | 'task' | 'asset'
-    const [projects, setProjects] = useState([])
+    const [syncTime, setSyncTime] = useState(null)
+    const [quickAction, setQuickAction] = useState(null) // 'ticket' | 'asset' | 'task'
     const [form, setForm] = useState({})
     const [saving, setSaving] = useState(false)
 
-    const load = () => {
-        setLoading(true)
-        Promise.all([
-            dashboardApi.getOverview(),
-            dashboardApi.getWidgets(),
-            dashboardApi.getHealth(),
-        ]).then(([overview, w, h]) => {
-            setData(overview)
-            setWidgets(w)
-            setHealth(h)
-            setLastSync(new Date())
-        }).finally(() => setLoading(false))
-    }
+    const fetcher = useCallback(() => dashboardApi.getOverview(), [])
+    const widgetFetcher = useCallback(() => dashboardApi.getWidgets(), [])
+    const healthFetcher = useCallback(() => dashboardApi.getHealth(), [])
 
-    useEffect(load, [])
+    const { data, loading, reload } = useData(fetcher)
+    const { data: widgets } = useData(widgetFetcher)
+    const { data: health } = useData(healthFetcher)
 
-    const openQuickAction = async (type) => {
+    useEffect(() => {
+        if (!loading) setSyncTime(new Date().toLocaleTimeString())
+    }, [loading])
+
+    const openQuickAction = (type) => {
         setForm({})
         setQuickAction(type)
-        if (type === 'task' && projects.length === 0) {
-            const d = await api.get('/projects').then(d => d.projects ?? d)
-            setProjects(d)
-        }
     }
 
-    const submitQuickAction = async () => {
+    const handleQuickSubmit = async (e) => {
+        e.preventDefault()
         setSaving(true)
         try {
-            if (quickAction === 'ticket') await api.post('/tickets', { title: form.title, description: form.desc || '—', priority: form.priority || 'Low' })
-            if (quickAction === 'asset') await api.post('/assets', { name: form.name, assetTag: form.tag, category: form.category || 'Laptop' })
-            if (quickAction === 'task') await api.post('/tasks', { title: form.title, project: form.project, priority: form.priority || 'Medium' })
-            toast.success('Created successfully.')
+            let res
+            if (quickAction === 'ticket') res = await api.post('/tickets', form)
+            else if (quickAction === 'asset') res = await api.post('/assets', form)
+            else if (quickAction === 'task') res = await api.post('/tasks', form)
+            if (res?.error) return toast.error(res.error)
+            toast.success(`${quickAction} created.`)
             setQuickAction(null)
-            load()
+            reload()
         } catch (err) {
             toast.error(err.message)
         } finally {
@@ -73,7 +65,8 @@ export default function Dashboard() {
         }
     }
 
-    const totalRecords = (data?.assets?.total ?? 0) + (data?.tickets?.total ?? 0)
+    const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+    const setVal = (key) => (v) => setForm(f => ({ ...f, [key]: v }))
 
     return (
         <div className="dash-root">
@@ -81,8 +74,8 @@ export default function Dashboard() {
             <div className="dash-toolbar">
                 <span className="dash-title">Dashboard</span>
                 <div className="dash-toolbar-right">
-                    {lastSync && <span className="dash-sync-time">Synced {lastSync.toLocaleTimeString()}</span>}
-                    <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
+                    {syncTime && <span className="dash-sync-time">Last sync: {syncTime}</span>}
+                    <Button size="sm" variant="outline" onClick={reload} disabled={loading}>
                         <RefreshCw size={13} className={loading ? 'spin' : ''} />
                     </Button>
                 </div>
@@ -96,11 +89,49 @@ export default function Dashboard() {
                 <Button size="sm" variant="outline" onClick={() => openQuickAction('task')}><Plus size={12} />New Task</Button>
             </div>
 
+            {/* Quick Action Dialog */}
+            <Dialog open={!!quickAction} onOpenChange={() => setQuickAction(null)}>
+                <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {quickAction === 'ticket' ? 'New Ticket' : quickAction === 'asset' ? 'Add Asset' : 'New Task'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleQuickSubmit} className="flex flex-col gap-3">
+                        {quickAction === 'ticket' && <>
+                            <Input placeholder="Title *" onChange={set('title')} required />
+                            <Input placeholder="Description" onChange={set('description')} />
+                            <Select onValueChange={setVal('priority')} defaultValue="Medium">
+                                <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
+                                <SelectContent>
+                                    {['Low', 'Medium', 'High', 'Critical'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </>}
+                        {quickAction === 'asset' && <>
+                            <Input placeholder="Asset Tag *" onChange={set('assetTag')} required />
+                            <Input placeholder="Name / Label *" onChange={set('name')} required />
+                            <Input placeholder="User" onChange={set('user')} />
+                        </>}
+                        {quickAction === 'task' && <>
+                            <Input placeholder="Title *" onChange={set('title')} required />
+                            <Input placeholder="Assigned To" onChange={set('assignedTo')} />
+                            <Select onValueChange={setVal('priority')} defaultValue="Medium">
+                                <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
+                                <SelectContent>
+                                    {['Low', 'Medium', 'High'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </>}
+                        <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Create'}</Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             {/* Main panels */}
             <div className="dash-panels">
                 {/* Left column */}
                 <div className="dash-panel-main">
-                    {/* Stat cards */}
                     <div className="dash-section-label">Overview</div>
                     <div className="stat-grid">
                         {loading ? [...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-md" />)
@@ -175,7 +206,6 @@ export default function Dashboard() {
 
                 {/* Right column */}
                 <div className="dash-panel-side">
-                    {/* System status */}
                     <div className="dash-section-label">System Status</div>
                     <div className="dash-status-list">
                         {[
@@ -191,7 +221,6 @@ export default function Dashboard() {
                         ))}
                     </div>
 
-                    {/* Recent tickets */}
                     <div className="dash-section-label" style={{ marginTop: 16 }}>Recent Open Tickets</div>
                     <div className="dash-feed">
                         {loading ? <Skeleton className="h-20" /> :
@@ -206,7 +235,6 @@ export default function Dashboard() {
                         }
                     </div>
 
-                    {/* Overdue tasks */}
                     <div className="dash-section-label" style={{ marginTop: 16 }}>Overdue Tasks</div>
                     <div className="dash-feed">
                         {loading ? <Skeleton className="h-20" /> :
@@ -225,72 +253,14 @@ export default function Dashboard() {
                                 ))
                         }
                     </div>
-
-                    {/* Announcements */}
-                    <div className="dash-section-label" style={{ marginTop: 16 }}>Announcements</div>
-                    <div className="dash-feed">
-                        {loading ? <Skeleton className="h-20" /> :
-                            widgets?.announcements?.length === 0
-                                ? <span className="dash-empty">No announcements</span>
-                                : widgets?.announcements?.map(a => (
-                                    <div key={a._id} className="dash-feed-row" onClick={() => navigate('/knowledge-base')}>
-                                        <Badge variant="outline" className="shrink-0">{a.category}</Badge>
-                                        <span className="dash-feed-title">{a.title}</span>
-                                    </div>
-                                ))
-                        }
-                    </div>
                 </div>
             </div>
 
             {/* Status bar */}
             <div className="dash-statusbar">
                 <span>IT Productivity</span>
-                <span>{loading ? 'Loading...' : `${totalRecords} total records`}</span>
+                <span>{syncTime ? `Updated ${syncTime}` : 'Loading...'}</span>
             </div>
-
-            {/* Quick Action Dialog */}
-            <Dialog open={!!quickAction} onOpenChange={() => setQuickAction(null)}>
-                <DialogContent className="max-w-sm">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {quickAction === 'ticket' && 'New Ticket'}
-                            {quickAction === 'asset' && 'Add Asset'}
-                            {quickAction === 'task' && 'New Task'}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-3">
-                        {quickAction === 'ticket' && <>
-                            <Input placeholder="Title *" onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-                            <Input placeholder="Description" onChange={e => setForm(f => ({ ...f, desc: e.target.value }))} />
-                            <Select onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
-                                <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
-                                <SelectContent>{['Low','Medium','High','Critical'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </>}
-                        {quickAction === 'asset' && <>
-                            <Input placeholder="Name *" onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                            <Input placeholder="Asset Tag *" onChange={e => setForm(f => ({ ...f, tag: e.target.value }))} />
-                            <Select onValueChange={v => setForm(f => ({ ...f, category: v }))}>
-                                <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
-                                <SelectContent>{['Laptop','Desktop','Server','Network','Peripheral','Software','Mobile'].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </>}
-                        {quickAction === 'task' && <>
-                            <Input placeholder="Title *" onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-                            <Select onValueChange={v => setForm(f => ({ ...f, project: v }))}>
-                                <SelectTrigger><SelectValue placeholder="Project *" /></SelectTrigger>
-                                <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
-                            </Select>
-                            <Select onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
-                                <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
-                                <SelectContent>{['Low','Medium','High','Critical'].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </>}
-                        <Button onClick={submitQuickAction} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

@@ -964,6 +964,54 @@ code {
 .badge-retired     { background: rgba(160,174,192,0.15); color: #4a5568; }
 .badge-lost        { background: rgba(229,62,62,0.15);  color: #c53030; }
 
+/* === Assets Page === */
+.assets-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.assets-search {
+    width: 260px;
+    height: 28px;
+    font-size: 12px;
+}
+
+.assets-grid {
+    flex: 1;
+    overflow: auto;
+}
+
+.assets-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.assets-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.assets-field label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    font-family: var(--mono);
+}
+
+.assets-form-footer {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;

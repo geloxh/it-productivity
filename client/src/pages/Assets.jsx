@@ -25,6 +25,20 @@ const EMPTY = {
     equipmentStatus: 'Good', dateAcquired: '', notes: ''
 }
 
+const FIELDS = [
+    { key: 'assetTag', label: 'Asset Tag', required: true },
+    { key: 'name', label: 'Name / Label', required: true },
+    { key: 'user', label: 'User' },
+    { key: 'formerUser', label: 'Former User' },
+    { key: 'serialNumber', label: 'Serial No.' },
+    { key: 'manufacturer', label: 'Brand / Manufacturer' },
+    { key: 'model', label: 'Model' },
+    { key: 'deviceYearModel', label: 'Year Model' },
+    { key: 'systemInfo', label: 'System Info (OS, CPU, RAM...)' },
+    { key: 'company', label: 'Company' },
+    { key: 'notes', label: 'Notes' },
+]
+
 export default function Assets() {
     const fetcher = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
     const { data: assets = [], loading, reload } = useData(fetcher)
@@ -73,118 +87,154 @@ export default function Assets() {
     )
 
     return (
-        <div className="space-y-4">
-            <div className="page-header">
-                <h2>Assets</h2>
-                <Button onClick={() => setShowForm(true)}>+ Add Asset</Button>
+        <div className="assets-root">
+            {/* Toolbar */}
+            <div className="dash-toolbar">
+                <span className="dash-title">Asset Inventory</span>
+                <div className="dash-toolbar-right">
+                    <Input
+                        placeholder="Search name, tag, user, serial..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="assets-search"
+                    />
+                    <Button size="sm" onClick={() => setShowForm(true)}>+ Add Asset</Button>
+                </div>
             </div>
 
+            {/* Add Asset Dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                    <DialogTitle>Add Asset</DialogTitle>
+                        <DialogTitle>Add Asset</DialogTitle>
                     </DialogHeader>
-                    <form className="asset-form" onSubmit={handleSubmit}>
-                    <Input placeholder="Asset Tag *" value={form.assetTag} onChange={set('assetTag')} required />
-                    <Input placeholder="User" value={form.user} onChange={set('user')} />
-                    <Select value={form.category} onValueChange={setVal('category')}>
-                        <SelectTrigger><SelectValue placeholder="Type / Category" /></SelectTrigger>
-                        <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Input placeholder="Serial No." value={form.serialNumber} onChange={set('serialNumber')} />
-                    <Input placeholder="System Info (OS, CPU, RAM...)" value={form.systemInfo} onChange={set('systemInfo')} />
-                    <Input placeholder="Brand / Manufacturer" value={form.manufacturer} onChange={set('manufacturer')} />
-                    <Input placeholder="Model" value={form.model} onChange={set('model')} />
-                    <Input placeholder="Device Year Model" value={form.deviceYearModel} onChange={set('deviceYearModel')} />
-                    <Input placeholder="Former User" value={form.formerUser} onChange={set('formerUser')} />
-                    <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
-                        <SelectTrigger><SelectValue placeholder="Contract Status" /></SelectTrigger>
-                        <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
-                    <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
-                        <SelectTrigger><SelectValue placeholder="Equipment Status" /></SelectTrigger>
-                        <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Input placeholder="Company" value={form.company} onChange={set('company')} />
-                    <Input placeholder="Name / Label *" value={form.name} onChange={set('name')} required />
-                    <Input placeholder="Notes" value={form.notes} onChange={set('notes')} />
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
+                    <form onSubmit={handleSubmit} className="assets-form">
+                        {FIELDS.map(({ key, label, required }) => (
+                            <div key={key} className="assets-field">
+                                <label>{label}{required && ' *'}</label>
+                                <Input value={form[key]} onChange={set(key)} required={required} />
+                            </div>
+                        ))}
+                        <div className="assets-field">
+                            <label>Category</label>
+                            <Select value={form.category} onValueChange={setVal('category')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Contract Status</label>
+                            <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Equipment Status</label>
+                            <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Date Acquired</label>
+                            <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
+                        </div>
+                        <div className="assets-form-footer">
+                            <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>
 
-            <Input placeholder="Search by name, tag, user, serial..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
-
-            {loading ? (
-                <div className="space-y-2">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
-            ) : (
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>User</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Serial No.</TableHead>
-                            <TableHead>System Info</TableHead>
-                            <TableHead>Brand</TableHead>
-                            <TableHead>Model</TableHead>
-                            <TableHead>Year Model</TableHead>
-                            <TableHead>Former User</TableHead>
-                            <TableHead>Contract</TableHead>
-                            <TableHead>Date Acquired</TableHead>
-                            <TableHead>Equip. Status</TableHead>
-                            <TableHead>Notes</TableHead>
-                            <TableHead>Company</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filtered.length === 0 && (
-                            <TableRow><TableCell colSpan={15} className="text-center text-muted-foreground py-8">No assets found.</TableCell></TableRow>
-                        )}
-                        {filtered.map(a => (
-                            <TableRow key={a._id}>
-                                <TableCell>{a.user || '—'}</TableCell>
-                                <TableCell>{a.category}</TableCell>
-                                <TableCell><code>{a.serialNumber || '—'}</code></TableCell>
-                                <TableCell>{a.systemInfo || '—'}</TableCell>
-                                <TableCell>{a.manufacturer || '—'}</TableCell>
-                                <TableCell>{a.model || '—'}</TableCell>
-                                <TableCell>{a.deviceYearModel || '—'}</TableCell>
-                                <TableCell>{a.formerUser || '—'}</TableCell>
-                                <TableCell>{a.contractStatus || '—'}</TableCell>
-                                <TableCell>{a.dateAcquired ? new Date(a.dateAcquired).toLocaleDateString() : '—'}</TableCell>
-                                <TableCell>{a.equipmentStatus || '—'}</TableCell>
-                                <TableCell className="max-w-[120px] truncate" title={a.notes}>{a.notes || '—'}</TableCell>
-                                <TableCell>{a.company || '—'}</TableCell>
-                                <TableCell>
-                                    <Select value={a.status} onValueChange={v => handleStatusChange(a._id, v)}>
-                                        <SelectTrigger className="w-32 h-7">
-                                            <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </TableCell>
-                                <TableCell>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="destructive" size="sm">Delete</Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <p>Delete <strong>{a.name}</strong>? This cannot be undone.</p>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(a._id)}>Delete</AlertDialogAction>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </TableCell>
+            {/* Data Grid */}
+            <div className="assets-grid">
+                {loading ? (
+                    <div className="p-4 space-y-2">
+                        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Asset Tag</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>User</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Serial No.</TableHead>
+                                <TableHead>System Info</TableHead>
+                                <TableHead>Brand</TableHead>
+                                <TableHead>Model</TableHead>
+                                <TableHead>Year</TableHead>
+                                <TableHead>Former User</TableHead>
+                                <TableHead>Contract</TableHead>
+                                <TableHead>Acquired</TableHead>
+                                <TableHead>Equip.</TableHead>
+                                <TableHead>Notes</TableHead>
+                                <TableHead>Company</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead></TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            )}
+                        </TableHeader>
+                        <TableBody>
+                            {filtered.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={17} className="text-center text-muted-foreground py-10">
+                                        No assets found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            {filtered.map(a => (
+                                <TableRow key={a._id}>
+                                    <TableCell><code>{a.assetTag || '—'}</code></TableCell>
+                                    <TableCell className="font-medium">{a.name || '—'}</TableCell>
+                                    <TableCell>{a.user || '—'}</TableCell>
+                                    <TableCell>{a.category}</TableCell>
+                                    <TableCell><code>{a.serialNumber || '—'}</code></TableCell>
+                                    <TableCell className="max-w-[140px] truncate" title={a.systemInfo}>{a.systemInfo || '—'}</TableCell>
+                                    <TableCell>{a.manufacturer || '—'}</TableCell>
+                                    <TableCell>{a.model || '—'}</TableCell>
+                                    <TableCell>{a.deviceYearModel || '—'}</TableCell>
+                                    <TableCell>{a.formerUser || '—'}</TableCell>
+                                    <TableCell>{a.contractStatus || '—'}</TableCell>
+                                    <TableCell>{a.dateAcquired ? new Date(a.dateAcquired).toLocaleDateString() : '—'}</TableCell>
+                                    <TableCell>{a.equipmentStatus || '—'}</TableCell>
+                                    <TableCell className="max-w-[100px] truncate" title={a.notes}>{a.notes || '—'}</TableCell>
+                                    <TableCell>{a.company || '—'}</TableCell>
+                                    <TableCell>
+                                        <Select value={a.status} onValueChange={v => handleStatusChange(a._id, v)}>
+                                            <SelectTrigger className="w-28 h-7">
+                                                <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </TableCell>
+                                    <TableCell>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="sm">Delete</Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <p>Delete <strong>{a.name}</strong>? This cannot be undone.</p>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(a._id)}>Delete</AlertDialogAction>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </div>
+
+            {/* Status bar */}
+            <div className="dash-statusbar">
+                <span>{filtered.length} asset{filtered.length !== 1 ? 's' : ''}{search ? ' (filtered)' : ''}</span>
+                <span>{assets.filter(a => a.status === 'Available').length} available · {assets.filter(a => a.status === 'Assigned').length} assigned</span>
+            </div>
         </div>
     )
 }
