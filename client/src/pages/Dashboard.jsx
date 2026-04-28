@@ -27,6 +27,7 @@ export default function Dashboard() {
 
     return (
         <div className="dash-root">
+            {/** Toolbar */}
             <div className="dash-toolbar">
                 <span className="dash-title">Dashboard</span>
                 <div className="dash-toolbar-right">
@@ -39,6 +40,7 @@ export default function Dashboard() {
 
             {/** Main Panels */}
             <div className="dash-panels">
+                {/** Left: Stats */}
                 <div className="dash-panel-main">
                     <div className="dash-section-label">Overview</div>
                     <div className="stat-grid">
@@ -79,7 +81,7 @@ export default function Dashboard() {
                     )}
                 </div>
 
-                {/** Right Activity Feed */}
+                {/** Right: Activity Feed */}
                 <div className="dash-panel-side">
                     <div className="dash-section-label">System Status</div>
                     <div className="dash-status-list">
@@ -101,7 +103,7 @@ export default function Dashboard() {
             {/** Status bar */}
             <div className="dash-statusbar">
                 <span>IT Productivity</span>
-                <span>{loading ? 'loading...' : `${(data?.assets?.total ?? 0) + (data?.tickets?.total ?? 0)} total records` }</span>
+                <span>{loading ? 'Loading...' : `${(data?.assets?.total ?? 0) + (data?.tickets?.total ?? 0)} total records` }</span>
             </div>
         </div>
     )
