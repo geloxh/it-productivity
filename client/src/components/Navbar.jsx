@@ -1,6 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
 
@@ -21,11 +20,11 @@ export default function Navbar() {
     }
 
     return (
-        <header className="navbar">
-            <span className="navbar-title">{PAGE_TITLES[pathname] ?? 'IT Productivity'}</span>
-            <span className="text-sm text-muted-foreground" style={{ flex: 1 }}>{user?.email}</span>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut size={14} /> Logout
+        <header className="app-navbar">
+            <span className="app-navbar-page">{PAGE_TITLES[pathname] ?? 'IT Productivity'}</span>
+            <span className="app-navbar-user">{user?.email}</span>
+            <Button variant="ghost" size="sm" className="app-navbar-logout" onClick={handleLogout}>
+                <LogOut size={13} /> Logout
             </Button>
         </header>
     )

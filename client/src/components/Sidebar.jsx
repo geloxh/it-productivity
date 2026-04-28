@@ -14,18 +14,27 @@ const links = [
 
 export default function Sidebar({ collapsed, onToggle }) {
     return (
-        <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''}`}>
-            <div className="sidebar-header">
-                {!collapsed && <div className="sidebar-logo">IT Productivity</div>}
-                <button className="sidebar-toggle" onClick={onToggle} title="Toggle sidebar">
-                    {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+        <aside className={`app-sidebar ${collapsed ? 'app-sidebar-collapsed' : ''}`}>
+            <div className="app-sidebar-header">
+                {!collapsed && (
+                    <div className="app-sidebar-brand">
+                        <div className="auth-logo-box">IT</div>
+                        <span className="app-sidebar-title">IT Productivity</span>
+                    </div>
+                )}
+                <button className="app-sidebar-toggle" onClick={onToggle} title="Toggle sidebar">
+                    {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
                 </button>
             </div>
-            <nav>
+            <nav className="app-sidebar-nav">
                 {links.map(({ to, label, icon: Icon }) => (
-                    <NavLink key={to} to={to} end className={({ isActive }) => isActive ? 'active' : ''} title={collapsed ? label : undefined}>
-                        <Icon size={16} />
-                        {!collapsed && label}
+                    <NavLink
+                        key={to} to={to} end
+                        className={({ isActive }) => `app-sidebar-link${isActive ? ' active' : ''}`}
+                        title={collapsed ? label : undefined}
+                    >
+                        <Icon size={15} />
+                        {!collapsed && <span>{label}</span>}
                     </NavLink>
                 ))}
             </nav>
