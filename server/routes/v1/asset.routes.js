@@ -11,5 +11,6 @@ router.get('/:id', checkPermission('assets', 'read'), assetController.getById);
 router.put('/:id', checkPermission('assets', 'update'), validate(updateAssetSchema), assetController.update);
 router.delete('/:id', checkPermission('assets', 'delete'), assetController.remove);
 router.patch('/:id/assign', checkPermission('assets', 'update'), assetController.assign);
+router.patch('/:id', checkPermission('assets', 'update'), validate(updateAssetSchema), assetController.update);
 
 module.exports = router;

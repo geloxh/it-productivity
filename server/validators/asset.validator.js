@@ -19,14 +19,23 @@ const createAssetSchema = z.object({
 });
 
 const updateAssetSchema = z.object({
-    name: z.string().min(2).max(100).optional(),
-    status: z.enum(['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost']).optional(),
-    equipmentStatus: z.enum(['Good', 'Defective', 'For Repair', 'For Disposal']).optional(),
-    contractStatus: z.enum(['Active', 'Expired', 'None']).optional(),
-    user: z.string().optional(),
-    formerUser: z.string().optional(),
-    notes: z.string().optional(),
-    assignedTo: z.string().nullable().optional(),
+    name:             z.string().min(2).max(100).optional(),
+    assetTag:         z.string().min(3).max(50).optional(),
+    serialNumber:     z.string().optional(),
+    category:         z.enum(['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Software', 'Mobile']).optional(),
+    manufacturer:     z.string().optional(),
+    model:            z.string().optional(),
+    deviceYearModel:  z.string().optional(),
+    systemInfo:       z.string().optional(),
+    user:             z.string().optional(),
+    formerUser:       z.string().optional(),
+    company:          z.string().optional(),
+    contractStatus:   z.enum(['Active', 'Expired', 'None']).optional(),
+    equipmentStatus:  z.enum(['Good', 'Defective', 'For Repair', 'For Disposal']).optional(),
+    status:           z.enum(['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost']).optional(),
+    dateAcquired:     z.string().optional(),
+    notes:            z.string().optional(),
+    assignedTo:       z.string().nullable().optional(),
 });
 
 module.exports = { createAssetSchema, updateAssetSchema };

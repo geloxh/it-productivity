@@ -843,57 +843,119 @@ code {
 }
 .btn-danger:hover { background: #e53e3e; color: #fff; }
 
-/* === Asset Status Badges === */
-.badge-available   { background: rgba(72,187,120,0.15); color: #276749; }
-.badge-assigned    { background: rgba(66,153,225,0.15); color: #2b6cb0; }
-.badge-maintenance { background: rgba(237,137,54,0.15);  color: #c05621; }
-.badge-retired     { background: rgba(160,174,192,0.15); color: #4a5568; }
-.badge-lost        { background: rgba(229,62,62,0.15);   color: #c53030; }
+/* === Asset View Toggle === */
+.assets-view-toggle { display: flex; gap: 2px; }
+.view-btn {
+  width: 28px; height: 28px;
+  border: 1px solid #bae6fd;
+  background: #f0f9ff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a7fa5;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.view-btn.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+.view-btn:hover:not(.active) { background: #e0f2fe; }
 
-/* === Assets / Shared Page Layout === */
-.assets-root {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+/* === Sticky Table Header === */
+.assets-sticky-header th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #e0f2fe;
 }
 
-.assets-search {
-  width: 260px;
-  height: 28px;
+/* === Draggable Column Header === */
+.assets-th-drag { cursor: grab; user-select: none; }
+.assets-th-drag:active { cursor: grabbing; }
+
+/* === Column Visibility Menu === */
+.col-menu {
+  position: absolute;
+  right: 0; top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 6px;
+  z-index: 50;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.12);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.col-menu-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px;
   font-size: 12px;
-}
-
-.assets-grid {
-  flex: 1;
-  overflow: auto;
-  background: #ffffff;
-}
-
-.assets-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.assets-field { display: flex; flex-direction: column; gap: 4px; }
-
-.assets-field label {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: #0369a1;
   font-family: var(--mono);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.col-menu-item:hover { background: #f0f9ff; }
+
+/* === Inline Cell Editing === */
+.inline-cell-view {
+  display: block;
+  min-width: 60px;
+  cursor: text;
+  padding: 1px 2px;
+  border-radius: 3px;
+  transition: background 0.1s;
+}
+.inline-cell-view:hover { background: #e0f2fe; }
+.inline-cell-empty { color: #bae6fd; }
+.inline-cell-input, .inline-cell-select {
+  width: 100%;
+  min-width: 80px;
+  padding: 2px 4px;
+  border: 1px solid #0284c7;
+  border-radius: 3px;
+  font-size: 12px;
+  background: #fff;
+  color: #0c4a6e;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(2,132,199,0.15);
 }
 
-.assets-form-footer {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 4px;
+/* === Asset Status Badge === */
+.asset-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--mono);
+  white-space: nowrap;
 }
+
+/* === Card / Grid Views === */
+.assets-card-list {
+  display: flex; flex-direction: column; gap: 8px; padding: 12px;
+}
+.assets-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px; padding: 12px;
+}
+.asset-card {
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 1px 4px rgba(14,165,233,0.06);
+}
+.asset-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.asset-card-name { font-weight: 600; color: #0c4a6e; font-size: 13px; }
+.asset-card-meta {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  font-size: 11px; color: #4a7fa5; font-family: var(--mono);
+}
+.asset-card-footer { display: flex; justify-content: flex-end; margin-top: 4px; }
 
 /* === Inline Form === */
 .inline-form {
