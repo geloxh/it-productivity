@@ -867,6 +867,124 @@ code {
   background: #e0f2fe;
 }
 
+
+/* === Bulk Operations === */
+.bulk-checkbox {
+  width: 14px; height: 14px;
+  cursor: pointer;
+  accent-color: #0284c7;
+}
+
+.bulk-row-selected td { background: #f0f9ff !important; }
+
+.bulk-select-banner {
+  padding: 6px 16px;
+  background: #e0f2fe;
+  border-bottom: 1px solid #bae6fd;
+  font-size: 12px;
+  color: #0369a1;
+  font-family: var(--mono);
+}
+
+.bulk-select-banner-btn {
+  background: none; border: none;
+  color: #0284c7; font-weight: 600;
+  cursor: pointer; font-size: 12px;
+  font-family: var(--mono);
+  text-decoration: underline;
+  padding: 0;
+}
+
+.bulk-action-bar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #0c4a6e;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(12,74,110,0.35);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.bulk-action-count {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: #7dd3fc;
+  padding-right: 4px;
+}
+
+.bulk-action-clear {
+  background: none; border: none;
+  color: #7dd3fc; cursor: pointer;
+  font-size: 14px; padding: 0 2px;
+  line-height: 1;
+}
+.bulk-action-clear:hover { color: #fff; }
+
+/* === Bulk Import === */
+.bulk-drop-zone {
+  border: 2px dashed #bae6fd;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  color: #7ab8d4;
+  font-size: 13px;
+  font-family: var(--mono);
+  transition: border-color 0.15s, background 0.15s;
+}
+.bulk-drop-zone:hover,
+.bulk-drop-zone--over {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+.bulk-mapping-grid { display: flex; flex-direction: column; gap: 6px; }
+
+.bulk-mapping-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.bulk-mapping-label {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: #0369a1;
+  text-transform: capitalize;
+}
+
+.bulk-preview {
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 8px;
+  background: #f0f9ff;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.bulk-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: #4a7fa5;
+  font-family: var(--mono);
+  padding: 3px 0;
+  border-bottom: 1px solid #e0f2fe;
+}
+.bulk-preview-row:last-child { border-bottom: none; }
+
+
+
+
 /* === Draggable Column Header === */
 .assets-th-drag { cursor: grab; user-select: none; }
 .assets-th-drag:active { cursor: grabbing; }
