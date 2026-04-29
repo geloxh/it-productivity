@@ -160,3 +160,17 @@ exports.getTimeSeries = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.getActivity = async (req, res) => {
+    try {
+        const AuditLog = require('../models/AuditLog')
+        const logs = await AuditLog.find()
+            .sort({ timeStamp: -1 })
+            .limit(20)
+            .populate('user', 'firstName lastName')
+            .select('action entity entityId user timeStamp status')
+        res.json(logs)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
