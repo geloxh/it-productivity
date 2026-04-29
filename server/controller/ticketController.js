@@ -48,6 +48,28 @@ exports.update = async (req, res) => {
     }
 };
 
+exports.bulkUpdate = async (req, res) => {
+    try {
+        const { ids, update } = req.body;
+        if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'No ids provided.' });
+        await Ticket.deleteMany({ _id: { $in: ids } }, sanitized);
+        res.json({ updated: ids.length });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.bulkDelete = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'No ids provided.' });
+        await Ticket.deleteMany({ _id: { $in: ids } });
+        res.json({ deleted: ids.length });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 exports.remove = async (req, res) => {
     try {
         const ticket = await Ticket.findByIdAndDelete(req.params.id);
