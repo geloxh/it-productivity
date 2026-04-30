@@ -9,6 +9,15 @@ exports.create = async (req, res) => {
     }
 };
 
+exports.bulkCreate = async (req, res) => {
+    try {
+        const assets = await Asset.insertMany(req.body, { ordered: false })
+        res.status(201).json({ inserted: assets.length })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 exports.getAll = async (req, res) => {
     try {
         const assets = await Asset.find()

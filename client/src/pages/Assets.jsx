@@ -16,6 +16,7 @@ const CATEGORIES = ['Laptop', 'Desktop', 'Server', 'Network', 'Peripheral', 'Sof
 const STATUSES = ['Available', 'Assigned', 'Maintenance', 'Retired', 'Lost']
 const EQUIPMENT_STATUSES = ['Good', 'Defective', 'For Repair', 'For Disposal']
 const CONTRACT_STATUSES = ['Active', 'Expired', 'None']
+const importRef = useRef()
 
 const STATUS_COLOR = {
   Available:   'badge-available',
@@ -42,6 +43,32 @@ const EMPTY = {
   name: '', assetTag: '', category: 'Laptop', serialNumber: '', manufacturer: '',
   model: '', deviceYearModel: '', systemInfo: '', user: '', formerUser: '',
   company: '', contractStatus: 'None', equipmentStatus: 'Good', dateAcquired: '', notes: ''
+}
+
+const handleExport = () => {
+  const cols = Object.keys(EMPTY)
+  const rows = [cols.join(','), ...filtered.map(a =>
+    cols.map(k => JSON.stringify(a[k] ?? '')).join(',')
+  )]
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  Object.assign(document.createElement('a'), { href: url, download: 'assets.csv' }).click()
+  URL.revokeObjectURL(url)
+}
+
+const handleImport = async (e) => {
+  const file = e.target.files[0]; e.target.value = ''
+  if (!file) return
+  const text = await file.text()
+  const [header, ...lines] = text.trim().split('\n')
+  const keys = header.split(',')
+  const records = lines.map(line => {
+    const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) ?? []
+    return Object.fromEntries(keys.map((k, i) => [k.trim(), (vals[i] ?? '').replace(/^"|"$/g, '').trim()]))
+  })
+  const res = await api.post('/assets/bulk', records)
+  if (res.error) return toast.error(res.error)
+  toast.success(`${res.inserted} assets imported.`); reload()
 }
 
 const FIELDS = [
@@ -193,6 +220,10 @@ export default function Assets() {
               </div>
             )}
           </div>
+          <Button size="sm" variant="outline" onClick={handleExport}>Export CSV</Button>
+          <Button size="sm" variant="outline" onClick={() => importRef.current.click()}>Import CSV</Button>
+          <input ref={importRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
+          
           <Button size="sm" onClick={() => setShowForm(true)}>+ Add Asset</Button>
         </div>
       </div>
