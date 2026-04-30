@@ -1210,3 +1210,110 @@ code {
 
 .dark .widget-drag-handle { color: #1e3a5f; }
 .dark .widget-drag-handle:hover { color: #4a7fa5; }
+
+/* === Pineed KPI Cards === */
+
+.kpi-pin-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kpi-pin-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+  background: #ffffff;
+  color: #4a7fa5;
+  font-size: 11px;
+  font-family: var(--mono);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.kpi-pin-card[data-alert="true"] {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.kpi-pin-card[data-crit="true"] {
+  border-color: #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.kpi-pin-val {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: inherit;
+}
+
+.kpi-pin-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* === Activity Feed === */
+.activity-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e0f2fe;
+  font-size: 12px;
+}
+
+.activity-row:last-child { border-bottom: none; }
+.activity-row:hover { background: #f0f9ff; border-radius: 4px; }
+
+.activity-icon {
+  font-size: 13px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.activity-body { flex: 1; color: #0c4a6e; }
+
+.activity-user {
+  font-weight: 600;
+  color: #0369a1;
+  font-family: var(--mono);
+}
+
+.activity-entity {
+  font-family: var(--mono);
+  color: #0284c7;
+  font-size: 11px;
+}
+
+.activity-time {
+  font-size: 10px;
+  color: #7ab8d4;
+  font-family: var(--mono);
+  flex-shrink: 0;
+}
+
+/* === Drag-and-drop Widget Handle === */
+.widget-drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: grab;
+  color: #bae6fd;
+  padding: 2px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  z-index: 1;
+}
+
+.widget-drag-handle:hover { color: #7ab8d4; }
+.widget-drag-handle:active { cursor: grabbing; }

@@ -29,10 +29,12 @@ exports.getOverview = async (req, res) => {
 
 exports.getWidgets = async (req, res) => {
     try {
+        const Asset = require('../models/Asset')
         const KnowledgeBase = require('../models/KnowledgeBase')
         const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-
+        // const ninetyDaysOut = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+        
         const [recentTickets, overdueTasksRaw, aging3, aging7, announcements] = await Promise.all([
             Ticket.find({ status: { $in: ['Open', 'In-Progress'] } })
                 .sort({ createdAt: -1 }).limit(5)
