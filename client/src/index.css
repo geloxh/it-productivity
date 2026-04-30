@@ -1151,3 +1151,62 @@ code {
     @apply font-sans;
   }
 }
+
+
+/* === Dark Mode === */
+.dark {
+  color-scheme: dark;
+  --background: #0a1628;
+  --foreground: #bae6fd;
+  --card: #0f1f35;
+  --card-foreground: #bae6fd;
+  --popover: #0f1f35;
+  --popover-foreground: #bae6fd;
+  --primary: #38bdf8;
+  --primary-foreground: #0a1628;
+  --secondary: #0f2a45;
+  --secondary-foreground: #7dd3fc;
+  --muted: #0f1f35;
+  --muted-foreground: #4a7fa5;
+  --accent: #0f2a45;
+  --accent-foreground: #7dd3fc;
+  --border: #1e3a5f;
+  --input: #0f2a45;
+  --ring: #0284c7;
+  --bg: #0a1628;
+  --text: #7dd3fc;
+  --text-h: #bae6fd;
+  --sidebar: #0a1628;
+  --sidebar-foreground: #bae6fd;
+  --sidebar-border: #1e3a5f;
+}
+
+.dark-body { background: #0a1628; color: #bae6fd}
+
+.dark .app-window { border-color: #1e3a5f; }
+.dark .app-titlebar { background: #0f1f35; border-color: #1e3a5f; color: #7dd3fc; }
+.dark .app-navbar { background: #0f1f35; border-color: #1e3a5f; }
+.dark .app-statusbar { background: #0f1f35; border-color: #1e3a5f; }
+.dark .app-sidebar { background: linear-gradient(160deg, #0a1628 0%, #0f2a45 100%); }
+.dark .layout-content { background: #0a1628; }
+
+.dark .dash-toolbar { background: #0f1f35; border-color: #1e3a5f; }
+.dark .dash-quickbar { background: #0a1628; border-color: #1e3a5f; }
+.dark .dash-panels { background: #0a1628; }
+.dark .dash-subpanel { background: #0f1f35; border-color: #1e3a5f; }
+.dark .dash-statusbar { background: #0f1f35; border-color: #1e3a5f; }
+.dark .stat-card { background: #0f1f35; border-color: #1e3a5f; }
+.dark .dash-feed-row:hover { background: #0f2a45; }
+.dark .dash-aging-card { background: #0f1f35; border-color: #1e3a5f; }
+.dark .dash-aging-card[data-warn="true"] { background: #1a1200; border-color: #92400e; }
+.dark .dash-aging-card[data-crit="true"] { background: #1a0000; border-color: #991b1b; }
+
+.dark .kpi-pin-card { background: #0f1f35; border-color: #1e3a5f; }
+.dark .kpi-pin-card[data-alert="true"] { background: #1a0f00; border-color: #92400e; }
+.dark .kpi-pin-card[data-crit="true"] { background: #1a0000; border-color: #991b1b; }
+
+.dark .activity-row { border-color: #1e3a5f; }
+.dark .activity-row:hover { background: #0f2a45; }
+
+.dark .widget-drag-handle { color: #1e3a5f; }
+.dark .widget-drag-handle:hover { color: #4a7fa5; }

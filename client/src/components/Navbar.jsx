@@ -1,7 +1,8 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { LogOut } from 'lucide-react'
+import { LogOut, Sun, Moon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const PAGE_TITLES = {
     '/': 'Dashboard', '/assets': 'Assets', '/tickets': 'Tickets',
@@ -13,6 +14,12 @@ export default function Navbar() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()
     const { pathname } = useLocation()
+    const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
+
+    useEffect(() => {
+        document.deocumentElement.classList.toggle('dark', dark)
+        localStorage.setItem('theme', dark ? 'dark' : 'light')
+    }, [dark])
 
     const handleLogout = async () => {
         await logout()
@@ -23,6 +30,9 @@ export default function Navbar() {
         <header className="app-navbar">
             <span className="app-navbar-page">{PAGE_TITLES[pathname] ?? 'IT Productivity'}</span>
             <span className="app-navbar-user">{user?.email}</span>
+            <Button variant="ghost" size="sm" className="app-navbar-logout" onClick={() => setDark(d => !d)} title="Toggle theme">
+                {dark ? <sun size={13} /> : <Moon size={13} />}
+            </Button>
             <Button variant="ghost" size="sm" className="app-navbar-logout" onClick={handleLogout}>
                 <LogOut size={13} /> Logout
             </Button>
