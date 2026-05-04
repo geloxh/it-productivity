@@ -587,6 +587,14 @@ code {
   gap: 8px;
 }
 
+.dash-title-count {
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+}
+
 .dash-sync-time {
   font-size: 11px;
   color: #7ab8d4;
@@ -894,7 +902,7 @@ code {
 
 .bulk-action-bar {
   position: fixed;
-  bottom: 32px;
+  bottom: 48px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -1315,8 +1323,24 @@ code {
 .page-skeleton > * { height: 32px; width: 100%; }
 
 .table-empty { text-align: center; color: var(--muted-foreground); padding: 40px 0; font-size: 13px; }
-.table-cell-title { font-weight: 500; color: var(--text-h); cursor: pointer; }
-.table-cell-title:hover { text-decoration: underline; }
+
+.table-cell-title {
+    font-weight: 500;
+    color: var(--text-h);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.table-cell-title::after {
+    content: '↗';
+    font-size: 10px;
+    color: var(--muted-foreground);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.table-cell-title:hover::after { opacity: 1; }
+
 .table-cell-truncate { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .table-cell-muted { font-size: 12px; color: var(--muted-foreground); }
 

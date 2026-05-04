@@ -32,6 +32,9 @@ export default function Tickets() {
     const [filterStatus, setFilterStatus] = useState('all')
     const [filterPriority, setFilterPriority] = useState('all')
     const [filterCategory, setFilterCategory] = useState('all')
+
+    const hasFilters = search || filterStatus !== 'all' || filterPriority !== 'all' || filterCategory !== 'all'
+
     const [selected, setSelected] = useState(new Set())
     const [allPagesSelected, setAllPagesSelected] = useState(false)
     const [showImport, setShowImport] = useState(false)
@@ -79,8 +82,14 @@ export default function Tickets() {
     }
 
     const handleStatusChange = async (id, status) => {
-        try { await api.put(`/tickets/${id}`, { status }); reload() }
-        catch (err) { toast.error(err.message) }
+        try { 
+            await api.put(`/tickets/${id}`, 
+            { status }) 
+            toast.success(`Status updated to ${status}.`)
+            reload()
+        } catch (err) { 
+            toast.error(err.message) 
+        }
     }
 
     const openDetail = (ticket) => {
@@ -123,25 +132,26 @@ export default function Tickets() {
     const handleUndo = async (snapshot) => {
         try {
             await Promise.all(snapshot.map(t => api.post('/tickets', {
-                title: t.title, description: t.description, priority: t.priority, status: t.status
+                title: t.title, description: t.description, priority: t.priority, status: t.status, category: t.category, assignedTo: t.assignedTo?._id || undefined
             })))
             toast.success(`${snapshot.length} tickets restored.`); reload()
-        } catch (err) { toast.error('Undo failed: ' + err.message) }
+        } catch (err) { 
+            toast.error('Undo failed: ' + err.message) 
+        }
     }
 
     const bulkDeleteRequest = async () => {
         const snapshot = tickets.filter(t => activeIds.includes(t._id))
         try {
-            await fetch('/api/v1/tickets/bulk', {
-                method: 'DELETE', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ids: activeIds })
-            }).then(async r => { if (!r.ok) throw new Error((await r.json()).error) })
-            clearSelection(); reload()
-            toast(`${snapshot.length} tickets deleted.`, {
+            await api.delete('/tickets/bulk', { ids: activeIds })
+            clearSelection();
+            reload()
+            toast(`${snapshot.length} tickets dsleted.`, {
                 action: { label: 'Undo', onClick: () => handleUndo(snapshot) }, duration: 10000,
             })
-        } catch (err) { toast.error(err.message) }
+        } catch (err) { 
+            toast.error(err.message) 
+        }
     }
 
     const bulkExport = () => {
@@ -163,6 +173,13 @@ export default function Tickets() {
         } catch (err) { toast.error(err.message) }
     }
 
+    const resetFilters = () => {
+        setSearch('');
+        setFilterStatus('all');
+        setFilterPriority('all');
+        setFilterCategory('all');
+    }
+
     const pageIds = filtered.map(t => t._id)
     const allPageChecked = pageIds.length > 0 && pageIds.every(id => selected.has(id))
     const someChecked = selected.size > 0
@@ -170,7 +187,14 @@ export default function Tickets() {
     return (
         <div className="assets-root">
             <div className="dash-toolbar">
-                <span className="dash-title">Tickets</span>
+                <span className="dash-title">
+                    Tickets
+                    {tickets.length > 0 && (
+                        <span className="dash-title-count">
+                            ({tickets.filter(t => t.status === 'Open').length} open)
+                        </span>
+                    )}
+                </span>
                 <div className="dash-toolbar-right">
                     <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="assets-search" />
                     <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -194,6 +218,11 @@ export default function Tickets() {
                             {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
                     </Select>
+
+                    {hasFilters && (
+                        <Button size="sm" variant="ghost" onClick={resetFilters}>✕ Clear</Button>
+                    )}
+
                     <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>Import</Button>
                     <Button size="sm" onClick={() => setShowForm(true)}>+ Add Ticket</Button>
                 </div>
@@ -360,7 +389,20 @@ export default function Tickets() {
                                         ))}
                                     </div>
                                     <form onSubmit={handleAddComment} className="ticket-modal-comment-form">
-                                        <Input className="ticket-modal-comment-input" placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} />
+                                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                            <Input
+                                                className="ticket-modal-comment-input"
+                                                placeholder="Add a comment..."
+                                                value={commentText}
+                                                onChange={e => setCommentText(e.target.value)}
+                                                maxLength={1000}
+                                            />
+                                            {commentText.length > 800 && (
+                                                <span style={{ fontSize: 10, color: commentText.length >= 1000 ? '#dc2626' : 'var(--muted-foreground)', fontFamily: 'var(--mono)' }}>
+                                                    {commentText.length}/1000
+                                                </span>
+                                            )}
+                                        </div>
                                         <Button type="submit" size="sm" disabled={commentSaving || !commentText.trim()}>Post</Button>
                                     </form>
                                 </div>
@@ -393,7 +435,9 @@ export default function Tickets() {
                         <TableBody>
                             {filtered.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="table-empty">No tickets found.</TableCell>
+                                    <TableCell colSpan={7} className="table-empty">
+                                        {search || filterStatus !== 'all' || filterPriority !== 'all' || filterCategory !== 'all' ? '🔍 No tickets match your filters.' : '🎫 No tickets yet. Create one to get started.' }
+                                    </TableCell>
                                 </TableRow>
                             )}
                             {filtered.map(t => (
