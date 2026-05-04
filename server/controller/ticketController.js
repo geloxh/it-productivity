@@ -52,7 +52,7 @@ exports.bulkUpdate = async (req, res) => {
     try {
         const { ids, update } = req.body;
         if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'No ids provided.' });
-        await Ticket.deleteMany({ _id: { $in: ids } }, sanitized);
+        await Ticket.deleteMany({ _id: { $in: ids } }, update);
         res.json({ updated: ids.length });
     } catch (error) {
         res.status(400).json({ error: error.message });

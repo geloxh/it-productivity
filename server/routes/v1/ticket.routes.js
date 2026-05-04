@@ -7,6 +7,10 @@ const ticketController = require('../../controller/ticketController');
 
 router.post('/', checkPermission('tickets', 'create'), validate(createTicketSchema), ticketController.create);
 router.get('/', checkPermission('tickets', 'read'), ticketController.getAll);
+
+router.patch('/bulk', checkPermission('tickets', 'update'), ticketController.bulkUpdate);
+router.delete('/bulk', checkPermission('tickets', 'delete'), ticketController.bulkDelete);
+
 router.get('/:id', checkPermission('tickets', 'read'), ticketController.getById);
 router.put('/:id', checkPermission('tickets', 'update'), validate(updateTicketSchema), ticketController.update);
 router.delete('/:id', checkPermission('tickets', 'delete'), ticketController.remove);
