@@ -1456,3 +1456,58 @@ code {
   font-size: 12px;
   height: 32px;
 }
+
+/* === Add Ticket Modal === */
+.add-ticket-modal { max-width: 420px; padding: 0; overflow: hidden; }
+
+.add-ticket-modal-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-ticket-modal-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--mono);
+    flex: 1;
+}
+
+.add-ticket-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.add-ticket-modal-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.add-ticket-modal-field:last-of-type { border-bottom: none; }
+
+.add-ticket-modal-label {
+    font-size: 11px;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    width: 72px;
+    flex-shrink: 0;
+}
+
+.add-ticket-modal-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--muted);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

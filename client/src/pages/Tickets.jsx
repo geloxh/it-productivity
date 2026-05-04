@@ -238,42 +238,50 @@ export default function Tickets() {
 
             {/* Add Ticket Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="dialog-md">
-                    <DialogHeader><DialogTitle>Add Ticket</DialogTitle></DialogHeader>
-                    <form onSubmit={handleSubmit} className="dialog-form">
-                        <div className="assets-field">
-                            <label>Title *</label>
-                            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                <DialogContent className="add-ticket-modal">
+                    <div className="add-ticket-modal-header">
+                        <span className="add-ticket-modal-title">New Ticket</span>
+                        <DialogTitle className="sr-only">Add Ticket</DialogTitle>
+                    </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="add-ticket-modal-body">
+                            <div className="add-ticket-modal-field">
+                                <span className="add-ticket-modal-label">Title *</span>
+                                <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required style={{ height: 28, fontSize: 12 }} />
+                            </div>
+                            <div className="add-ticket-modal-field">
+                                <span className="add-ticket-modal-label">Description *</span>
+                                <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required style={{ height: 28, fontSize: 12 }} />
+                            </div>
+                            <div className="add-ticket-modal-field">
+                                <span className="add-ticket-modal-label">Category</span>
+                                <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                                    <SelectTrigger className="status-select"><SelectValue /></SelectTrigger>
+                                    <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="add-ticket-modal-field">
+                                <span className="add-ticket-modal-label">Priority</span>
+                                <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
+                                    <SelectTrigger className="status-select"><SelectValue /></SelectTrigger>
+                                    <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="add-ticket-modal-field">
+                                <span className="add-ticket-modal-label">Assign To</span>
+                                <Select value={form.assignedTo || 'unassigned'} onValueChange={v => setForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
+                                    <SelectTrigger className="status-select"><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                                        {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
-                        <div className="assets-field">
-                            <label>Description *</label>
-                            <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
+                        <div className="add-ticket-modal-footer">
+                            <Button type="button" size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                            <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Create Ticket'}</Button>
                         </div>
-                        <div className="assets-field">
-                            <label>Category</label>
-                            <Select value={form.category} onValueChange={v =>                             setForm(f => ({ ...f, category: v }))}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </div>
-                        <div className="assets-field">
-                            <label>Priority</label>
-                            <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </div>
-                        <div className="assets-field">
-                            <label>Assign To</label>
-                            <Select value={form.assignedTo || 'unassigned'} onValueChange={v => setForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
-                                <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                                    {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Ticket'}</Button>
                     </form>
                 </DialogContent>
             </Dialog>
