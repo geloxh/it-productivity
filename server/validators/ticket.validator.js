@@ -1,9 +1,12 @@
 const { z } = require('zod');
 
+const CATEGORIES = ['Hardware', 'Software', 'Network', 'Access', 'Other'];
+
 const createTicketSchema = z.object({
     title: z.string().min(3).max(200),
     description: z.string().min(1),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical']).optional(),
+    assignedTo: z.string().optional(),
     relatedAsset: z.string().optional()
 });
 

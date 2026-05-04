@@ -14,49 +14,54 @@ import BulkImportModal from '../components/BulkImportModal'
 
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 const STATUSES = ['Open', 'In-Progress', 'Resolved', 'Closed']
+const CATEGORIES = ['Hardware', 'Software', 'Network', 'Access', 'Other']
 const PRIORITY_VARIANT = { Low: 'secondary', Medium: 'outline', High: 'default', Critical: 'destructive' }
 const STATUS_VARIANT = { Open: 'default', 'In-Progress': 'outline', Resolved: 'secondary', Closed: 'secondary' }
-const EMPTY = { title: '', description: '', priority: 'Low' }
+const EMPTY = { title: '', description: '', priority: 'Low', category: 'Other', assignedTo: '' }
 
 export default function Tickets() {
     const fetcher = useCallback(() => api.get('/tickets').then(d => d.tickets ?? d), [])
     const { data: tickets = [], loading, reload } = useData(fetcher)
+    const usersFetcher = useCallback(() => api.get('/users'), [])
+    const { data: users = [] } = useData(usersFetcher)
+
     const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
     const [saving, setSaving] = useState(false)
     const [search, setSearch] = useState('')
+    const [filterStatus, setFilterStatus] = useState('all')
+    const [filterPriority, setFilterPriority] = useState('all')
+    const [filterCategory, setFilterCategory] = useState('all')
     const [selected, setSelected] = useState(new Set())
     const [allPagesSelected, setAllPagesSelected] = useState(false)
     const [showImport, setShowImport] = useState(false)
+    const [detailTicket, setDetailTicket] = useState(null)
+    const [editForm, setEditForm] = useState(null)
+    const [commentText, setCommentText] = useState('')
+    const [commentSaving, setCommentSaving] = useState(false)
     const undoRef = useRef(null)
 
-    const filtered = tickets.filter(t =>
-        t.title.toLowerCase().includes(search.toLowerCase()) ||
-        t.description?.toLowerCase().includes(search.toLowerCase())
-    )
+    const filtered = tickets.filter(t => {
+        const matchText = t.title.toLowerCase().includes(search.toLowerCase()) ||
+            t.description?.toLowerCase().includes(search.toLowerCase())
+        const matchStatus = filterStatus === 'all' || t.status === filterStatus
+        const matchPriority = filterPriority === 'all' || t.priority === filterPriority
+        const matchCategory = filterCategory === 'all' || t.category === filterCategory
+        return matchText && matchStatus && matchPriority && matchCategory
+    })
 
     // --- Selection ---
     const toggleRow = (id) => setSelected(s => {
-        const n = new Set(s)
-        n.has(id) ? n.delete(id) : n.add(id)
-        setAllPagesSelected(false)
-        return n
+        const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id)
+        setAllPagesSelected(false); return n
     })
-
     const togglePageAll = () => {
         const pageIds = filtered.map(t => t._id)
         const allChecked = pageIds.every(id => selected.has(id))
-        setSelected(allChecked ? new Set() : new Set(pageIds))
-        setAllPagesSelected(false)
+        setSelected(allChecked ? new Set() : new Set(pageIds)); setAllPagesSelected(false)
     }
-
-    const selectAllPages = () => {
-        setSelected(new Set(filtered.map(t => t._id)))
-        setAllPagesSelected(true)
-    }
-
+    const selectAllPages = () => { setSelected(new Set(filtered.map(t => t._id))); setAllPagesSelected(true) }
     const clearSelection = () => { setSelected(new Set()); setAllPagesSelected(false) }
-
     const activeIds = allPagesSelected ? filtered.map(t => t._id) : [...selected]
 
     // --- Single ops ---
@@ -80,59 +85,56 @@ export default function Tickets() {
         catch (err) { toast.error(err.message) }
     }
 
+    // --- Detail modal ---
+    const openDetail = (ticket) => {
+        setDetailTicket(ticket)
+        setEditForm({ ...ticket, assignedTo: ticket.assignedTo?._id ?? '' })
+    }
+    const closeDetail = () => { setDetailTicket(null); setEditForm(null); setCommentText('') }
+
+    const handleEditSave = async () => {
+        setSaving(true)
+        try {
+            await api.put(`/tickets/${detailTicket._id}`, {
+                title: editForm.title,
+                description: editForm.description,
+                priority: editForm.priority,
+                status: editForm.status,
+                category: editForm.category,
+                assignedTo: editForm.assignedTo || undefined
+            })
+            toast.success('Ticket updated.'); reload(); closeDetail()
+        } catch (err) { toast.error(err.message) }
+        finally { setSaving(false) }
+    }
+
+    const handleAddComment = async (e) => {
+        e.preventDefault(); if (!commentText.trim()) return
+        setCommentSaving(true)
+        try {
+            const updated = await api.post(`/tickets/${detailTicket._id}/comments`, { text: commentText })
+            setCommentText(''); setDetailTicket(updated); reload()
+        } catch (err) { toast.error(err.message) }
+        finally { setCommentSaving(false) }
+    }
+
     // --- Bulk ops ---
     const bulkUpdateStatus = async (status) => {
         try {
             await api.patch('/tickets/bulk', { ids: activeIds, update: { status } })
-            toast.success(`${activeIds.length} tickets updated.`)
-            clearSelection(); reload()
-        } catch (err) { toast.error(err.message) }
-    }
-
-    const bulkDelete = async () => {
-        const snapshot = tickets.filter(t => activeIds.includes(t._id))
-        try {
-            await api.delete('/tickets/bulk', { ids: activeIds })
-            clearSelection(); reload()
-            const tid = toast(`${snapshot.length} tickets deleted.`, {
-                action: { label: 'Undo', onClick: () => handleUndo(snapshot, tid) },
-                duration: 10000,
-            })
-            undoRef.current = { snapshot, tid }
+            toast.success(`${activeIds.length} tickets updated.`); clearSelection(); reload()
         } catch (err) { toast.error(err.message) }
     }
 
     const handleUndo = async (snapshot) => {
         try {
             await Promise.all(snapshot.map(t => api.post('/tickets', {
-                title: t.title, description: t.description,
-                priority: t.priority, status: t.status
+                title: t.title, description: t.description, priority: t.priority, status: t.status
             })))
-            toast.success(`${snapshot.length} tickets restored.`)
-            reload()
+            toast.success(`${snapshot.length} tickets restored.`); reload()
         } catch (err) { toast.error('Undo failed: ' + err.message) }
     }
 
-    const bulkExport = () => {
-        const rows = tickets.filter(t => activeIds.includes(t._id))
-        const csv = [
-            ['Title', 'Description', 'Priority', 'Status'].join(','),
-            ...rows.map(t => [t.title, t.description, t.priority, t.status]
-                .map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
-        ].join('\n')
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
-        a.download = 'tickets.csv'; a.click()
-    }
-
-    const handleImport = async (ticketRows) => {
-        try {
-            await Promise.all(ticketRows.map(t => api.post('/tickets', t)))
-            toast.success(`${ticketRows.length} tickets imported.`)
-            reload()
-        } catch (err) { toast.error(err.message) }
-    }
-    
     const bulkDeleteRequest = async () => {
         const snapshot = tickets.filter(t => activeIds.includes(t._id))
         try {
@@ -143,9 +145,27 @@ export default function Tickets() {
             }).then(async r => { if (!r.ok) throw new Error((await r.json()).error) })
             clearSelection(); reload()
             toast(`${snapshot.length} tickets deleted.`, {
-                action: { label: 'Undo', onClick: () => handleUndo(snapshot) },
-                duration: 10000,
+                action: { label: 'Undo', onClick: () => handleUndo(snapshot) }, duration: 10000,
             })
+        } catch (err) { toast.error(err.message) }
+    }
+
+    const bulkExport = () => {
+        const rows = tickets.filter(t => activeIds.includes(t._id))
+        const csv = [
+            ['Title', 'Description', 'Category', 'Priority', 'Status'].join(','),
+            ...rows.map(t => [t.title, t.description, t.category, t.priority, t.status]
+                .map(v => `"${String(v ?? '').replace(/"/g, '""')}`).join(','))
+        ].join('\n')
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+        a.download = 'tickets.csv'; a.click()
+    }
+
+    const handleImport = async (ticketRows) => {
+        try {
+            await Promise.all(ticketRows.map(t => api.post('/tickets', t)))
+            toast.success(`${ticketRows.length} tickets imported.`); reload()
         } catch (err) { toast.error(err.message) }
     }
 
@@ -159,12 +179,32 @@ export default function Tickets() {
                 <span className="dash-title">Tickets</span>
                 <div className="dash-toolbar-right">
                     <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="assets-search" />
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Statuses</SelectItem>
+                            {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={filterPriority} onValueChange={setFilterPriority}>
+                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Priority" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Priorities</SelectItem>
+                            {PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={filterCategory} onValueChange={setFilterCategory}>
+                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                     <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>Import</Button>
                     <Button size="sm" onClick={() => setShowForm(true)}>+ Add Ticket</Button>
                 </div>
             </div>
 
-            {/* Select-all-pages banner */}
             {someChecked && !allPagesSelected && selected.size === filtered.length && filtered.length < tickets.length && (
                 <div className="bulk-select-banner">
                     {selected.size} tickets on this page selected.{' '}
@@ -180,7 +220,6 @@ export default function Tickets() {
                 </div>
             )}
 
-            {/* Floating action bar */}
             {someChecked && (
                 <div className="bulk-action-bar">
                     <span className="bulk-action-count">{activeIds.length} selected</span>
@@ -203,6 +242,7 @@ export default function Tickets() {
                 </div>
             )}
 
+            {/* Add Ticket Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-md">
                     <DialogHeader><DialogTitle>Add Ticket</DialogTitle></DialogHeader>
@@ -216,16 +256,112 @@ export default function Tickets() {
                             <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
                         </div>
                         <div className="assets-field">
+                            <label>Category</label>
+                            <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
                             <label>Priority</label>
                             <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
                             </Select>
                         </div>
+                        <div className="assets-field">
+                            <label>Assign To</label>
+                            <Select value={form.assignedTo} onValueChange={v => setForm(f => ({ ...f, assignedTo: v }))}>
+                                <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">Unassigned</SelectItem>
+                                    {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Ticket'}</Button>
                     </form>
                 </DialogContent>
             </Dialog>
+
+            {/* Detail / Edit Modal */}
+            {detailTicket && editForm && (
+                <Dialog open={!!detailTicket} onOpenChange={closeDetail}>
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader><DialogTitle>Ticket Detail</DialogTitle></DialogHeader>
+                        <div className="flex flex-col gap-3">
+                            <div className="assets-field">
+                                <label>Title</label>
+                                <Input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
+                            </div>
+                            <div className="assets-field">
+                                <label>Description</label>
+                                <textarea
+                                    value={editForm.description}
+                                    onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                                    rows={3}
+                                    style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14, background: 'var(--bg)', color: 'var(--text-h)', resize: 'vertical' }}
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="assets-field flex-1">
+                                    <label>Category</label>
+                                    <Select value={editForm.category} onValueChange={v => setEditForm(f => ({ ...f, category: v }))}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="assets-field flex-1">
+                                    <label>Priority</label>
+                                    <Select value={editForm.priority} onValueChange={v => setEditForm(f => ({ ...f, priority: v }))}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="assets-field flex-1">
+                                    <label>Status</label>
+                                    <Select value={editForm.status} onValueChange={v => setEditForm(f => ({ ...f, status: v }))}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="assets-field">
+                                <label>Assign To</label>
+                                <Select value={editForm.assignedTo} onValueChange={v => setEditForm(f => ({ ...f, assignedTo: v }))}>
+                                    <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">Unassigned</SelectItem>
+                                        {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button onClick={handleEditSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
+
+                            <hr />
+                            <span style={{ fontWeight: 600, fontSize: 14 }}>Comments ({detailTicket.comments?.length ?? 0})</span>
+                            <div className="flex flex-col gap-2" style={{ maxHeight: 200, overflowY: 'auto' }}>
+                                {!detailTicket.comments?.length && (
+                                    <span className="text-muted-foreground text-sm">No comments yet.</span>
+                                )}
+                                {detailTicket.comments?.map((c, i) => (
+                                    <div key={i} style={{ background: 'var(--muted)', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
+                                        <span style={{ fontWeight: 500 }}>{c.user?.name ?? c.user?.email ?? 'User'}</span>
+                                        <span style={{ color: 'var(--muted-foreground)', marginLeft: 8, fontSize: 11 }}>
+                                            {new Date(c.createdAt).toLocaleString()}
+                                        </span>
+                                        <p style={{ margin: '4px 0 0' }}>{c.text}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <form onSubmit={handleAddComment} className="flex gap-2">
+                                <Input placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} />
+                                <Button type="submit" size="sm" disabled={commentSaving || !commentText.trim()}>Post</Button>
+                            </form>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
 
             <BulkImportModal open={showImport} onClose={() => setShowImport(false)} onImport={handleImport} />
 
@@ -237,25 +373,31 @@ export default function Tickets() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-8">
-                                    <input type="checkbox" checked={allPageChecked} onChange={togglePageAll}
-                                        className="bulk-checkbox" aria-label="Select all on page" />
+                                    <input type="checkbox" checked={allPageChecked} onChange={togglePageAll} className="bulk-checkbox" aria-label="Select all on page" />
                                 </TableHead>
-                                <TableHead>Title</TableHead><TableHead>Description</TableHead>
-                                <TableHead>Priority</TableHead><TableHead>Status</TableHead><TableHead></TableHead>
+                                <TableHead>Title</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Priority</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Assigned To</TableHead>
+                                <TableHead></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filtered.length === 0 && (
-                                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-10">No tickets found.</TableCell></TableRow>
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-center text-muted-foreground py-10">No tickets found.</TableCell>
+                                </TableRow>
                             )}
                             {filtered.map(t => (
-                                <TableRow key={t._id} data-selected={selected.has(t._id)} className={selected.has(t._id) ? 'bulk-row-selected' : ''}>
+                                <TableRow key={t._id} className={selected.has(t._id) ? 'bulk-row-selected' : ''}>
                                     <TableCell>
-                                        <input type="checkbox" checked={selected.has(t._id)} onChange={() => toggleRow(t._id)}
-                                            className="bulk-checkbox" aria-label={`Select ${t.title}`} />
+                                        <input type="checkbox" checked={selected.has(t._id)} onChange={() => toggleRow(t._id)} className="bulk-checkbox" aria-label={`Select ${t.title}`} />
                                     </TableCell>
-                                    <TableCell className="font-medium">{t.title}</TableCell>
-                                    <TableCell className="max-w-xs truncate">{t.description}</TableCell>
+                                    <TableCell className="font-medium cursor-pointer hover:underline" onClick={() => openDetail(t)}>
+                                        {t.title}
+                                    </TableCell>
+                                    <TableCell><Badge variant="outline">{t.category ?? 'Other'}</Badge></TableCell>
                                     <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
                                     <TableCell>
                                         <Select value={t.status} onValueChange={v => handleStatusChange(t._id, v)}>
@@ -264,6 +406,9 @@ export default function Tickets() {
                                             </SelectTrigger>
                                             <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                                         </Select>
+                                    </TableCell>
+                                                                         <TableCell className="text-sm text-muted-foreground">
+                                        {t.assignedTo?.name ?? t.assignedTo?.email ?? '—'}
                                     </TableCell>
                                     <TableCell>
                                         <AlertDialog>

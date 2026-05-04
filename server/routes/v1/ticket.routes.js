@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { validate } = require('../../middleware/validate');
 const { checkPermission } = require('../../middleware/rbac');
-const { createTicketSchema, updateTicketSchema } = require('../../validators/ticket.validator');
+const { createTicketSchema, updateTicketSchema, addCommentSchema } = require('../../validators/ticket.validator');
 const ticketController = require('../../controller/ticketController');
 
 router.post('/', checkPermission('tickets', 'create'), validate(createTicketSchema), ticketController.create);
@@ -14,5 +14,6 @@ router.delete('/bulk', checkPermission('tickets', 'delete'), ticketController.bu
 router.get('/:id', checkPermission('tickets', 'read'), ticketController.getById);
 router.put('/:id', checkPermission('tickets', 'update'), validate(updateTicketSchema), ticketController.update);
 router.delete('/:id', checkPermission('tickets', 'delete'), ticketController.remove);
+router.post('/:id/comments', checkPermission('tickets', 'update'), validate(addCommentSchema), ticketController.addComment);
 
 module.exports = router;
