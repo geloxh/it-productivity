@@ -12,14 +12,12 @@ export default function Sessions() {
 
     const logoutAll = async () => {
         await api.post('/sessions/logout-all')
-        toast.success('Logged out of all devices.')
-        reload()
+        toast.success('Logged out of all devices.'); reload()
     }
 
     const logoutOthers = async () => {
         await api.post('/sessions/logout-others')
-        toast.success('Logged out of other devices.')
-        reload()
+        toast.success('Logged out of other devices.'); reload()
     }
 
     return (
@@ -34,7 +32,7 @@ export default function Sessions() {
 
             <div className="assets-grid">
                 {loading ? (
-                    <div className="p-4 space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                    <div className="page-skeleton">{[...Array(4)].map((_, i) => <Skeleton key={i} />)}</div>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -46,12 +44,12 @@ export default function Sessions() {
                         </TableHeader>
                         <TableBody>
                             {sessions.length === 0 && (
-                                <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-10">No active sessions.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={3} className="table-empty">No active sessions.</TableCell></TableRow>
                             )}
                             {sessions.map(s => (
                                 <TableRow key={s._id}>
                                     <TableCell><code>{s.ipAddress}</code></TableCell>
-                                    <TableCell className="max-w-xs truncate">{s.userAgent}</TableCell>
+                                    <TableCell className="table-cell-truncate">{s.userAgent}</TableCell>
                                     <TableCell>{new Date(s.expiresAt).toLocaleString()}</TableCell>
                                 </TableRow>
                             ))}

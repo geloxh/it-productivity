@@ -20,13 +20,10 @@ export default function Users() {
 
     const toggleActive = async (id, current) => {
         try {
-            const res = await api.patch(`/users/${id}`, {
-                                isActive: !current })
+            const res = await api.patch(`/users/${id}`, { isActive: !current })
             if (res.error) return toast.error(res.error)
             reload()
-        } catch (err) {
-            toast.error(err.message)
-        }
+        } catch (err) { toast.error(err.message) }
     }
 
     const filtered = users.filter(u =>
@@ -46,7 +43,7 @@ export default function Users() {
 
             <div className="assets-grid">
                 {loading ? (
-                    <div className="p-4 space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                    <div className="page-skeleton">{[...Array(6)].map((_, i) => <Skeleton key={i} />)}</div>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -58,11 +55,11 @@ export default function Users() {
                         </TableHeader>
                         <TableBody>
                             {filtered.length === 0 && (
-                                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-10">No users found.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={6} className="table-empty">No users found.</TableCell></TableRow>
                             )}
                             {filtered.map(u => (
                                 <TableRow key={u._id}>
-                                    <TableCell className="font-medium">{u.firstName} {u.lastName}</TableCell>
+                                    <TableCell className="table-cell-title">{u.firstName} {u.lastName}</TableCell>
                                     <TableCell>{u.email}</TableCell>
                                     <TableCell><Badge variant={ROLE_VARIANT[u.role] ?? 'outline'}>{u.role}</Badge></TableCell>
                                     <TableCell>{u.jobTitle || '—'}</TableCell>
@@ -88,4 +85,3 @@ export default function Users() {
         </div>
     )
 }
-

@@ -50,7 +50,6 @@ export default function Tickets() {
         return matchText && matchStatus && matchPriority && matchCategory
     })
 
-    // --- Selection ---
     const toggleRow = (id) => setSelected(s => {
         const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id)
         setAllPagesSelected(false); return n
@@ -64,11 +63,10 @@ export default function Tickets() {
     const clearSelection = () => { setSelected(new Set()); setAllPagesSelected(false) }
     const activeIds = allPagesSelected ? filtered.map(t => t._id) : [...selected]
 
-    // --- Single ops ---
     const handleSubmit = async (e) => {
         e.preventDefault(); setSaving(true)
         try {
-            await api.post('/tickets', form)
+            await api.post('/tickets', { ...form, assignedTo: form.assignedTo === 'unassigned' ? undefined : form.assignedTo || undefined })
             toast.success('Ticket created.')
             setForm(EMPTY); setShowForm(false); reload()
         } catch (err) { toast.error(err.message) }
@@ -85,10 +83,9 @@ export default function Tickets() {
         catch (err) { toast.error(err.message) }
     }
 
-    // --- Detail modal ---
     const openDetail = (ticket) => {
         setDetailTicket(ticket)
-        setEditForm({ ...ticket, assignedTo: ticket.assignedTo?._id ?? '' })
+        setEditForm({ ...ticket, assignedTo: ticket.assignedTo?._id ?? 'unassigned' })
     }
     const closeDetail = () => { setDetailTicket(null); setEditForm(null); setCommentText('') }
 
@@ -96,12 +93,10 @@ export default function Tickets() {
         setSaving(true)
         try {
             await api.put(`/tickets/${detailTicket._id}`, {
-                title: editForm.title,
-                description: editForm.description,
-                priority: editForm.priority,
-                status: editForm.status,
+                title: editForm.title, description: editForm.description,
+                priority: editForm.priority, status: editForm.status,
                 category: editForm.category,
-                assignedTo: editForm.assignedTo || undefined
+                assignedTo: editForm.assignedTo === 'unassigned' ? undefined : editForm.assignedTo || undefined
             })
             toast.success('Ticket updated.'); reload(); closeDetail()
         } catch (err) { toast.error(err.message) }
@@ -118,7 +113,6 @@ export default function Tickets() {
         finally { setCommentSaving(false) }
     }
 
-    // --- Bulk ops ---
     const bulkUpdateStatus = async (status) => {
         try {
             await api.patch('/tickets/bulk', { ids: activeIds, update: { status } })
@@ -180,21 +174,21 @@ export default function Tickets() {
                 <div className="dash-toolbar-right">
                     <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="assets-search" />
                     <Select value={filterStatus} onValueChange={setFilterStatus}>
-                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                        <SelectTrigger className="filter-select"><SelectValue placeholder="Status" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Statuses</SelectItem>
                             {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                     </Select>
                     <Select value={filterPriority} onValueChange={setFilterPriority}>
-                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Priority" /></SelectTrigger>
+                        <SelectTrigger className="filter-select"><SelectValue placeholder="Priority" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Priorities</SelectItem>
                             {PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                         </SelectContent>
                     </Select>
                     <Select value={filterCategory} onValueChange={setFilterCategory}>
-                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
+                        <SelectTrigger className="filter-select"><SelectValue placeholder="Category" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Categories</SelectItem>
                             {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -224,7 +218,7 @@ export default function Tickets() {
                 <div className="bulk-action-bar">
                     <span className="bulk-action-count">{activeIds.length} selected</span>
                     <Select onValueChange={bulkUpdateStatus}>
-                        <SelectTrigger className="h-7 w-36 text-xs bg-white"><SelectValue placeholder="Set status…" /></SelectTrigger>
+                        <SelectTrigger className="status-select"><SelectValue placeholder="Set status…" /></SelectTrigger>
                         <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
                     <Button size="sm" variant="outline" onClick={bulkExport}>Export CSV</Button>
@@ -244,9 +238,9 @@ export default function Tickets() {
 
             {/* Add Ticket Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="dialog-md">
                     <DialogHeader><DialogTitle>Add Ticket</DialogTitle></DialogHeader>
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <form onSubmit={handleSubmit} className="dialog-form">
                         <div className="assets-field">
                             <label>Title *</label>
                             <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
@@ -257,7 +251,7 @@ export default function Tickets() {
                         </div>
                         <div className="assets-field">
                             <label>Category</label>
-                            <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                            <Select value={form.category} onValueChange={v =>                             setForm(f => ({ ...f, category: v }))}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                             </Select>
@@ -271,10 +265,10 @@ export default function Tickets() {
                         </div>
                         <div className="assets-field">
                             <label>Assign To</label>
-                            <Select value={form.assignedTo} onValueChange={v => setForm(f => ({ ...f, assignedTo: v }))}>
+                            <Select value={form.assignedTo || 'unassigned'} onValueChange={v => setForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
                                 <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Unassigned</SelectItem>
+                                    <SelectItem value="unassigned">Unassigned</SelectItem>
                                     {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
                                 </SelectContent>
                             </Select>
@@ -285,80 +279,83 @@ export default function Tickets() {
             </Dialog>
 
             {/* Detail / Edit Modal */}
-            {detailTicket && editForm && (
+            {detailTicket && (
                 <Dialog open={!!detailTicket} onOpenChange={closeDetail}>
-                    <DialogContent className="max-w-lg">
-                        <DialogHeader><DialogTitle>Ticket Detail</DialogTitle></DialogHeader>
-                        <div className="flex flex-col gap-3">
-                            <div className="assets-field">
-                                <label>Title</label>
-                                <Input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
-                            </div>
-                            <div className="assets-field">
-                                <label>Description</label>
-                                <textarea
-                                    value={editForm.description}
-                                    onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                                    rows={3}
-                                    style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14, background: 'var(--bg)', color: 'var(--text-h)', resize: 'vertical' }}
-                                />
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="assets-field flex-1">
-                                    <label>Category</label>
-                                    <Select value={editForm.category} onValueChange={v => setEditForm(f => ({ ...f, category: v }))}>
-                                        <SelectTrigger><SelectValue /></SelectTrigger>
-                                        <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="assets-field flex-1">
-                                    <label>Priority</label>
-                                    <Select value={editForm.priority} onValueChange={v => setEditForm(f => ({ ...f, priority: v }))}>
-                                        <SelectTrigger><SelectValue /></SelectTrigger>
-                                        <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="assets-field flex-1">
-                                    <label>Status</label>
-                                    <Select value={editForm.status} onValueChange={v => setEditForm(f => ({ ...f, status: v }))}>
-                                        <SelectTrigger><SelectValue /></SelectTrigger>
-                                        <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <div className="assets-field">
-                                <label>Assign To</label>
-                                <Select value={editForm.assignedTo} onValueChange={v => setEditForm(f => ({ ...f, assignedTo: v }))}>
-                                    <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="">Unassigned</SelectItem>
-                                        {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <Button onClick={handleEditSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
-
-                            <hr />
-                            <span style={{ fontWeight: 600, fontSize: 14 }}>Comments ({detailTicket.comments?.length ?? 0})</span>
-                            <div className="flex flex-col gap-2" style={{ maxHeight: 200, overflowY: 'auto' }}>
-                                {!detailTicket.comments?.length && (
-                                    <span className="text-muted-foreground text-sm">No comments yet.</span>
-                                )}
-                                {detailTicket.comments?.map((c, i) => (
-                                    <div key={i} style={{ background: 'var(--muted)', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
-                                        <span style={{ fontWeight: 500 }}>{c.user?.name ?? c.user?.email ?? 'User'}</span>
-                                        <span style={{ color: 'var(--muted-foreground)', marginLeft: 8, fontSize: 11 }}>
-                                            {new Date(c.createdAt).toLocaleString()}
-                                        </span>
-                                        <p style={{ margin: '4px 0 0' }}>{c.text}</p>
+                    <DialogContent className="ticket-modal-content">
+                        {editForm && (
+                            <div className="ticket-modal-body">
+                                <div className="ticket-modal-left">
+                                    <span className="ticket-modal-section-label">Ticket Detail</span>
+                                    <div className="assets-field">
+                                        <label>Title</label>
+                                        <Input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
                                     </div>
-                                ))}
+                                    <div className="assets-field">
+                                        <label>Description</label>
+                                        <textarea
+                                            className="ticket-modal-textarea"
+                                            value={editForm.description}
+                                            onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                                            rows={4}
+                                        />
+                                    </div>
+                                    {[
+                                        { label: 'Category', key: 'category', options: CATEGORIES },
+                                        { label: 'Priority', key: 'priority', options: PRIORITIES },
+                                        { label: 'Status', key: 'status', options: STATUSES },
+                                    ].map(({ label, key, options }) => (
+                                        <div key={key} className="ticket-modal-prop-row">
+                                            <span className="ticket-modal-prop-label">{label}</span>
+                                            <Select value={editForm[key]} onValueChange={v => setEditForm(f => ({ ...f, [key]: v }))}>
+                                                <SelectTrigger className="status-select"><SelectValue /></SelectTrigger>
+                                                <SelectContent>{options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                                            </Select>
+                                        </div>
+                                    ))}
+                                    <div className="ticket-modal-prop-row">
+                                        <span className="ticket-modal-prop-label">Assigned</span>
+                                        <Select value={editForm.assignedTo || 'unassigned'} onValueChange={v => setEditForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
+                                            <SelectTrigger className="status-select"><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="unassigned">Unassigned</SelectItem>
+                                                {users.map(u => <SelectItem key={u._id} value={u._id}>{u.name ?? u.email}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="ticket-modal-save">
+                                        <Button size="sm" onClick={handleEditSave} disabled={saving} className="w-full">
+                                            {saving ? 'Saving...' : 'Save Changes'}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="ticket-modal-right">
+                                    <div className="ticket-modal-comments-header">
+                                        <span className="ticket-modal-section-label">
+                                            Comments ({detailTicket.comments?.length ?? 0})
+                                        </span>
+                                    </div>
+                                    <div className="ticket-modal-comments-list">
+                                        {!detailTicket.comments?.length && (
+                                            <span className="ticket-modal-comment-empty">No comments yet.</span>
+                                        )}
+                                        {detailTicket.comments?.map((c, i) => (
+                                            <div key={i} className="ticket-modal-comment">
+                                                <div className="ticket-modal-comment-meta">
+                                                    <span className="ticket-modal-comment-author">{c.user?.name ?? c.user?.email ?? 'User'}</span>
+                                                    <span className="ticket-modal-comment-time">{new Date(c.createdAt).toLocaleString()}</span>
+                                                </div>
+                                                <p className="ticket-modal-comment-text">{c.text}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <form onSubmit={handleAddComment} className="ticket-modal-comment-form">
+                                        <Input className="ticket-modal-comment-input" placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} />
+                                        <Button type="submit" size="sm" disabled={commentSaving || !commentText.trim()}>Post</Button>
+                                    </form>
+                                </div>
                             </div>
-                            <form onSubmit={handleAddComment} className="flex gap-2">
-                                <Input placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} />
-                                <Button type="submit" size="sm" disabled={commentSaving || !commentText.trim()}>Post</Button>
-                            </form>
-                        </div>
+                        )}
                     </DialogContent>
                 </Dialog>
             )}
@@ -367,7 +364,7 @@ export default function Tickets() {
 
             <div className="assets-grid">
                 {loading ? (
-                    <div className="p-4 space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                    <div className="page-skeleton">{[...Array(6)].map((_, i) => <Skeleton key={i} />)}</div>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -386,7 +383,7 @@ export default function Tickets() {
                         <TableBody>
                             {filtered.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center text-muted-foreground py-10">No tickets found.</TableCell>
+                                    <TableCell colSpan={7} className="table-empty">No tickets found.</TableCell>
                                 </TableRow>
                             )}
                             {filtered.map(t => (
@@ -394,20 +391,20 @@ export default function Tickets() {
                                     <TableCell>
                                         <input type="checkbox" checked={selected.has(t._id)} onChange={() => toggleRow(t._id)} className="bulk-checkbox" aria-label={`Select ${t.title}`} />
                                     </TableCell>
-                                    <TableCell className="font-medium cursor-pointer hover:underline" onClick={() => openDetail(t)}>
+                                    <TableCell className="table-cell-title" onClick={() => openDetail(t)}>
                                         {t.title}
                                     </TableCell>
                                     <TableCell><Badge variant="outline">{t.category ?? 'Other'}</Badge></TableCell>
                                     <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
                                     <TableCell>
                                         <Select value={t.status} onValueChange={v => handleStatusChange(t._id, v)}>
-                                            <SelectTrigger className="w-32 h-7">
+                                            <SelectTrigger className="status-select">
                                                 <Badge variant={STATUS_VARIANT[t.status] ?? 'outline'}>{t.status}</Badge>
                                             </SelectTrigger>
                                             <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                                         </Select>
                                     </TableCell>
-                                                                         <TableCell className="text-sm text-muted-foreground">
+                                    <TableCell className="table-cell-muted">
                                         {t.assignedTo?.name ?? t.assignedTo?.email ?? '—'}
                                     </TableCell>
                                     <TableCell>
@@ -436,3 +433,4 @@ export default function Tickets() {
         </div>
     )
 }
+

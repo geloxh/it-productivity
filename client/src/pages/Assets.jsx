@@ -18,18 +18,13 @@ const EQUIPMENT_STATUSES = ['Good', 'Defective', 'For Repair', 'For Disposal']
 const CONTRACT_STATUSES = ['Active', 'Expired', 'None']
 
 const STATUS_COLOR = {
-  Available:   'badge-available',
-  Assigned:    'badge-assigned',
-  Maintenance: 'badge-maintenance',
-  Retired:     'badge-retired',
-  Lost:        'badge-lost',
+  Available: 'badge-available', Assigned: 'badge-assigned',
+  Maintenance: 'badge-maintenance', Retired: 'badge-retired', Lost: 'badge-lost',
 }
-
 const EQUIP_COLOR = {
   Good: 'badge-available', Fair: 'badge-maintenance',
   Poor: 'badge-lost', Scrap: 'badge-retired', Excellent: 'badge-assigned',
 }
-
 const COL_LABELS = {
   assetTag: 'Asset Tag', name: 'Name', user: 'User', category: 'Type',
   serialNumber: 'Serial No.', systemInfo: 'System Info', manufacturer: 'Brand',
@@ -37,13 +32,11 @@ const COL_LABELS = {
   contractStatus: 'Contract', dateAcquired: 'Acquired', equipmentStatus: 'Equip.',
   notes: 'Notes', company: 'Company', status: 'Status',
 }
-
 const EMPTY = {
   name: '', assetTag: '', category: 'Laptop', serialNumber: '', manufacturer: '',
   model: '', deviceYearModel: '', systemInfo: '', user: '', formerUser: '',
   company: '', contractStatus: 'None', equipmentStatus: 'Good', dateAcquired: '', notes: ''
 }
-
 const FIELDS = [
   { key: 'assetTag', label: 'Asset Tag', required: true },
   { key: 'name', label: 'Name / Label', required: true },
@@ -62,35 +55,21 @@ function InlineCell({ value, onSave, type = 'text', options }) {
   const [editing, setEditing] = useState(false)
   const [val, setVal] = useState(value)
   const ref = useRef()
-
   const commit = () => { setEditing(false); if (val !== value) onSave(val) }
-
   if (editing) {
     if (options) return (
-      <select
-        autoFocus
-        className="inline-cell-select"
-        value={val}
+      <select autoFocus className="inline-cell-select" value={val}
         onChange={e => { setVal(e.target.value); setEditing(false); if (e.target.value !== value) onSave(e.target.value) }}
-        onBlur={() => setEditing(false)}
-        >
+        onBlur={() => setEditing(false)}>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
-    </select>
+      </select>
     )
     return (
-      <input
-        ref={ref}
-        autoFocus
-        className="inline-cell-input"
-        type={type}
-        value={val}
-        onChange={e => setVal(e.target.value)}
-        onBlur={commit}
-        onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false) }}
-      />
+      <input ref={ref} autoFocus className="inline-cell-input" type={type} value={val}
+        onChange={e => setVal(e.target.value)} onBlur={commit}
+        onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false) }} />
     )
   }
-
   return (
     <span className="inline-cell-view" onClick={() => { setVal(value); setEditing(true) }}>
       {value || <span className="inline-cell-empty">—</span>}
@@ -155,7 +134,6 @@ export default function Assets() {
   )
 
   const visibleCols = colOrder.filter(c => !hiddenCols.includes(c))
-
   const onDragStart = (col) => { dragCol.current = col }
   const onDrop = (col) => {
     if (!dragCol.current || dragCol.current === col) return
@@ -166,41 +144,38 @@ export default function Assets() {
   }
 
   const handleExport = () => {
-  const cols = Object.keys(EMPTY)
-  const rows = [cols.join(','), ...filtered.map(a =>
-    cols.map(k => JSON.stringify(a[k] ?? '')).join(',')
-  )]
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
-  const url = URL.createObjectURL(blob)
-  Object.assign(document.createElement('a'), { href: url, download: 'assets.csv' }).click()
-  URL.revokeObjectURL(url)
-}
+    const cols = Object.keys(EMPTY)
+    const rows = [cols.join(','), ...filtered.map(a => cols.map(k => JSON.stringify(a[k] ?? '')).join(','))]
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    Object.assign(document.createElement('a'), { href: url, download: 'assets.csv' }).click()
+    URL.revokeObjectURL(url)
+  }
 
-const handleImport = async (e) => {
-  const file = e.target.files[0]; e.target.value = ''
-  if (!file) return
-  const text = await file.text()
-  const [header, ...lines] = text.trim().split('\n')
-  const keys = header.split(',')
-  const records = lines.map(line => {
-    const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) ?? []
-    return Object.fromEntries(keys.map((k, i) => [k.trim(), (vals[i] ?? '').replace(/^"|"$/g, '').trim()]))
-  })
-  const res = await api.post('/assets/bulk', records)
-  if (res.error) return toast.error(res.error)
-  toast.success(`${res.inserted} assets imported.`); reload()
-}
+  const handleImport = async (e) => {
+    const file = e.target.files[0]; e.target.value = ''
+    if (!file) return
+    const text = await file.text()
+    const [header, ...lines] = text.trim().split('\n')
+    const keys = header.split(',')
+    const records = lines.map(line => {
+      const vals = line.match(/(\".*?\"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) ?? []
+      return Object.fromEntries(keys.map((k, i) => [k.trim(), (vals[i] ?? '').replace(/^\"|\"$/g, '').trim()]))
+    })
+    const res = await api.post('/assets/bulk', records)
+    if (res.error) return toast.error(res.error)
+    toast.success(`${res.inserted} assets imported.`); reload()
+  }
 
   return (
     <div className="assets-root">
-      {/* Toolbar */}
       <div className="dash-toolbar">
         <span className="dash-title">Asset Inventory</span>
         <div className="dash-toolbar-right">
           <Input placeholder="Search name, tag, user, serial..." value={search}
             onChange={e => setSearch(e.target.value)} className="assets-search" />
           <div className="assets-view-toggle">
-            {['table','card','grid'].map(m => (
+            {['table', 'card', 'grid'].map(m => (
               <button key={m} className={`view-btn${viewMode === m ? ' active' : ''}`} onClick={() => setViewMode(m)} title={m}>
                 {m === 'table' ? '☰' : m === 'card' ? '▤' : '⊞'}
               </button>
@@ -212,8 +187,7 @@ const handleImport = async (e) => {
               <div className="col-menu">
                 {colOrder.map(col => (
                   <label key={col} className="col-menu-item">
-                    <input type="checkbox" checked={!hiddenCols.includes(col)}
-                      onChange={() => toggleCol(col)} />
+                    <input type="checkbox" checked={!hiddenCols.includes(col)} onChange={() => toggleCol(col)} />
                     {COL_LABELS[col]}
                   </label>
                 ))}
@@ -223,14 +197,12 @@ const handleImport = async (e) => {
           <Button size="sm" variant="outline" onClick={handleExport}>Export CSV</Button>
           <Button size="sm" variant="outline" onClick={() => importRef.current.click()}>Import CSV</Button>
           <input ref={importRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
-          
           <Button size="sm" onClick={() => setShowForm(true)}>+ Add Asset</Button>
         </div>
       </div>
 
-      {/* Add Asset Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="dialog-lg">
           <DialogHeader><DialogTitle>Add Asset</DialogTitle></DialogHeader>
           <form onSubmit={handleSubmit} className="assets-form">
             {FIELDS.map(({ key, label, required }) => (
@@ -267,21 +239,18 @@ const handleImport = async (e) => {
         </DialogContent>
       </Dialog>
 
-      {/* Views */}
       <div className="assets-grid">
         {loading ? (
-          <div className="p-4 space-y-2">{[...Array(8)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+          <div className="page-skeleton">{[...Array(8)].map((_, i) => <Skeleton key={i} />)}</div>
         ) : viewMode === 'table' ? (
           <Table>
             <TableHeader className="assets-sticky-header">
               <TableRow>
                 {visibleCols.map(col => (
-                  <TableHead key={col} draggable
+                  <TableHead key={col} draggable className="assets-th-drag"
                     onDragStart={() => onDragStart(col)}
                     onDragOver={e => e.preventDefault()}
-                    onDrop={() => onDrop(col)}
-                    className="assets-th-drag"
-                  >
+                    onDrop={() => onDrop(col)}>
                     {COL_LABELS[col]}
                   </TableHead>
                 ))}
@@ -290,7 +259,7 @@ const handleImport = async (e) => {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={visibleCols.length + 1} className="text-center text-muted-foreground py-10">No assets found.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={visibleCols.length + 1} className="table-empty">No assets found.</TableCell></TableRow>
               )}
               {filtered.map(a => (
                 <TableRow key={a._id}>
@@ -315,7 +284,7 @@ const handleImport = async (e) => {
           </Table>
         ) : (
           <div className={viewMode === 'card' ? 'assets-card-list' : 'assets-card-grid'}>
-            {filtered.length === 0 && <p className="dash-empty" style={{ padding: 16 }}>No assets found.</p>}
+            {filtered.length === 0 && <p className="dash-empty">No assets found.</p>}
             {filtered.map(a => (
               <div key={a._id} className="asset-card">
                 <div className="asset-card-header">
@@ -347,7 +316,6 @@ const handleImport = async (e) => {
         )}
       </div>
 
-      {/* Status bar */}
       <div className="dash-statusbar">
         <span>{filtered.length} asset{filtered.length !== 1 ? 's' : ''}{search ? ' (filtered)' : ''}</span>
         <span>{assets.filter(a => a.status === 'Available').length} available · {assets.filter(a => a.status === 'Assigned').length} assigned</span>

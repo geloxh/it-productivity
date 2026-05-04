@@ -32,24 +32,14 @@ export default function Tasks() {
         try {
             await api.post('/tasks', form)
             toast.success('Task created.')
-            setForm({ ...EMPTY, project: form.project })
-            setShowForm(false)
-            reload()
-        } catch (err) {
-            toast.error(err.message)
-        } finally {
-            setSaving(false)
-        }
+            setForm({ ...EMPTY, project: form.project }); setShowForm(false); reload()
+        } catch (err) { toast.error(err.message) }
+        finally { setSaving(false) }
     }
 
     const handleDelete = async (id) => {
-        try {
-            await api.delete(`/tasks/${id}`)
-            toast.success('Task deleted.')
-            reload()
-        } catch (err) {
-            toast.error(err.message)
-        }
+        try { await api.delete(`/tasks/${id}`); toast.success('Task deleted.'); reload() }
+        catch (err) { toast.error(err.message) }
     }
 
     const filtered = tasks.filter(t =>
@@ -68,21 +58,21 @@ export default function Tasks() {
             </div>
 
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="dialog-md">
                     <DialogHeader><DialogTitle>Add Task</DialogTitle></DialogHeader>
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <form onSubmit={handleSubmit} className="dialog-form">
                         <div className="assets-field">
                             <label>Title *</label>
                             <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
                         </div>
                         <div className="assets-field">
                             <label>Project *</label>
-                            <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))} required>
+                            <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))}>
                                 <SelectTrigger><SelectValue placeholder="Select Project" /></SelectTrigger>
                                 <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
                             </Select>
                         </div>
-                        <div className="assets-field">
+                                                <div className="assets-field">
                             <label>Priority</label>
                             <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -96,7 +86,7 @@ export default function Tasks() {
 
             <div className="assets-grid">
                 {loadingTasks ? (
-                    <div className="p-4 space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                    <div className="page-skeleton">{[...Array(6)].map((_, i) => <Skeleton key={i} />)}</div>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -107,11 +97,11 @@ export default function Tasks() {
                         </TableHeader>
                         <TableBody>
                             {filtered.length === 0 && (
-                                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-10">No tasks found.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={4} className="table-empty">No tasks found.</TableCell></TableRow>
                             )}
                             {filtered.map(t => (
                                 <TableRow key={t._id}>
-                                    <TableCell className="font-medium">{t.title}</TableCell>
+                                    <TableCell className="table-cell-title">{t.title}</TableCell>
                                     <TableCell>{t.project?.name ?? '—'}</TableCell>
                                     <TableCell><Badge variant={PRIORITY_VARIANT[t.priority]}>{t.priority}</Badge></TableCell>
                                     <TableCell>

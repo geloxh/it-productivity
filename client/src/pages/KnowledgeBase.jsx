@@ -23,31 +23,22 @@ export default function KnowledgeBase() {
     const [search, setSearch] = useState('')
 
     const submit = async (e) => {
-        e.preventDefault()
-        setSaving(true)
+        e.preventDefault(); setSaving(true)
         try {
             const res = await api.post('/knowledge-base', form)
             if (res.error) return toast.error(res.error)
             toast.success('Article added.')
-            setForm(EMPTY)
-            setShowForm(false)
-            reload()
-        } catch (err) {
-            toast.error(err.message)
-        } finally {
-            setSaving(false)
-        }
+            setForm(EMPTY); setShowForm(false); reload()
+        } catch (err) { toast.error(err.message) }
+        finally { setSaving(false) }
     }
 
     const remove = async (id) => {
         try {
             const res = await api.delete(`/knowledge-base/${id}`)
             if (res.error) return toast.error(res.error)
-            toast.success('Article deleted.')
-            reload()
-        } catch (err) {
-            toast.error(err.message)
-        }
+            toast.success('Article deleted.'); reload()
+        } catch (err) { toast.error(err.message) }
     }
 
     const togglePublish = async (id, current) => {
@@ -55,9 +46,7 @@ export default function KnowledgeBase() {
             const res = await api.patch(`/knowledge-base/${id}`, { isPublished: !current })
             if (res.error) return toast.error(res.error)
             reload()
-        } catch (err) {
-            toast.error(err.message)
-        }
+        } catch (err) { toast.error(err.message) }
     }
 
     const filtered = articles.filter(a =>
@@ -76,9 +65,9 @@ export default function KnowledgeBase() {
             </div>
 
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="dialog-md">
                     <DialogHeader><DialogTitle>Add Article</DialogTitle></DialogHeader>
-                    <form onSubmit={submit} className="flex flex-col gap-3">
+                    <form onSubmit={submit} className="dialog-form">
                         <div className="assets-field">
                             <label>Title *</label>
                             <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
@@ -101,7 +90,7 @@ export default function KnowledgeBase() {
 
             <div className="assets-grid">
                 {loading ? (
-                    <div className="p-4 space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+                    <div className="page-skeleton">{[...Array(6)].map((_, i) => <Skeleton key={i} />)}</div>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -112,11 +101,11 @@ export default function KnowledgeBase() {
                         </TableHeader>
                         <TableBody>
                             {filtered.length === 0 && (
-                                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-10">No articles found.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={5} className="table-empty">No articles found.</TableCell></TableRow>
                             )}
                             {filtered.map(a => (
                                 <TableRow key={a._id}>
-                                    <TableCell className="font-medium">{a.title}</TableCell>
+                                    <TableCell className="table-cell-title">{a.title}</TableCell>
                                     <TableCell><Badge variant="outline">{a.category}</Badge></TableCell>
                                     <TableCell>{a.views ?? 0}</TableCell>
                                     <TableCell>
