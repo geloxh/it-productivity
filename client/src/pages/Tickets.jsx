@@ -285,7 +285,9 @@ export default function Tickets() {
                         {editForm && (
                             <div className="ticket-modal-body">
                                 <div className="ticket-modal-left">
-                                    <span className="ticket-modal-section-label">Ticket Detail</span>
+                                    <DialogHeader style={{ padding: '16px 24px 0' }}>
+                                        <DialogTitle className="ticket-modal-section-label">Ticket Detail</DialogTitle>
+                                    </DialogHeader>
                                     <div className="assets-field">
                                         <label>Title</label>
                                         <Input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />

@@ -56,9 +56,8 @@ const checkPermission = (resource, action) => {
         const userRole = req.user.role;
         const permissions = PERMISSIONS[resource]?.[userRole] || [];
 
-        if (permissions.includes(action) || permissions.includes(action.split(':')[0])) {
-            return next();
-        }
+        const hasPermission = permissions.some( p => p === action || p.split(':') [0] === action);
+        if (hasPermission) return next();
 
         return res.status(403).json({ error: { message: 'Access denied.'} });
     };
