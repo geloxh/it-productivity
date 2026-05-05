@@ -32,7 +32,7 @@ export default function SubmitTicket() {
             if (!res.ok) throw new Error(data.error ?? 'Submission failed.')
             setStatus('success')
         } catch (err) {
-            setErrorMsg('err.msg')
+            setErrorMsg('err.message')
         } finally {
             setLoading(false)
         }
