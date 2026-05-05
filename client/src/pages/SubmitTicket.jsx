@@ -7,26 +7,32 @@ import { Input } from '@/components/ui/input'
 
 const INITIAL = { title: '', description: '', priority: 'Low', guestName: '', guestEmail: '' }
 
+const PRIORITIES = [ 'Low', 'Medium', 'High', 'Critical' ]
+
 export default function SubmitTicket() {
     const [form, setForm] = useState(INITIAL)
     const [status, setStatus] = useState(null)
+    const [errorMsg, setErrorMsg] = useState('')
     const [loading, setLoading] = useState(false)
 
     const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setLoading(true)
+        setLoading(true);
+        setErrorMsg('')
         try {
             const res = await fetch('/api/v1/public/tickets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form)
             })
-            if (!res.ok) throw new Error()
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error ?? 'Submission failed.')
             setStatus('success')
-        } catch {
-            setStatus('error')
+        } catch (err) {
+            setErrorMsg('err.msg')
         } finally {
             setLoading(false)
         }
@@ -34,14 +40,21 @@ export default function SubmitTicket() {
 
     if (status === 'success') return (
         <div className="auth-page">
-            <div className="auth-form" style={{ textAlign: 'center', gap: 16 }}>
-                <div style={{ fontSize: 40 }}>✅</div>
+            <div className="submit-success">
+                <div className="submit-success-icon">✅</div>
                 <h2>Ticket Submitted</h2>
-                <p className="auth-form-desc">We'll get back to you at <strong>{form.guestEmail}</strong>.</p>
+                <p className="auth-form-desc">
+                    We'll get back to you at <strong>{form.guestEmail}</strong>.
+                </p>
+                <p className="auth-form-desc">
+                    Keep an eye on your inbox - our IT Team typically responds within 1 business day.
+                </p>
                 <Button variant="outline" onClick={() => { setForm(INITIAL); setStatus(null) }}>
-                    Submit Another
+                    Submit Another Ticket
                 </Button>
-                <Link to="/login"><p className="auth-switch">Staff? <span style={{ fontWeight: 500 }}>Sign in</span></p></Link>
+                <Link to="/login">
+                    <p className="auth-switch">Staff? <span className="auth-switch-bold">Sign in</span></p>
+                </Link>
             </div>
         </div>
     )
@@ -51,9 +64,14 @@ export default function SubmitTicket() {
             <div className="auth-panel">
                 <div className="auth-branding">
                     <div className="auth-branding-inner">
-                        <div className="auth-logo">🎫</div>
+                        <div className="auth-logo-box">IT</div>
                         <h1 className="auth-brand-title">Submit a Ticket</h1>
                         <p className="auth-brand-sub">Describe your issue and our IT team will respond promptly.</p>
+                        <ul className="auth-feature-list">
+                            <li>⚡ Fast response times</li>
+                            <li>🔒 Secure submission</li>
+                            <li>📧 Email confirmation</li>
+                        </ul>
                     </div>
                 </div>
                 <div className="auth-form-panel">
@@ -62,40 +80,68 @@ export default function SubmitTicket() {
                             <h2>New Support Request</h2>
                             <p className="auth-form-desc">Fill in the details below</p>
                         </div>
-                        {status === 'error' && <p className="error">Submission failed. Please try again.</p>}
+                        {errorMsg && <p className="error">{errorMsg}</p>}
                         <div className="auth-row">
                             <div className="auth-field">
-                                <label>Name</label>
-                                <Input required placeholder="Your name" value={form.guestName} onChange={set('guestName')} />
+                                <label>Name *</label>
+                                <Input 
+                                    required 
+                                    placeholder="Your name" 
+                                    value={form.guestName} 
+                                    onChange={set('guestName')}
+                                    maxLength={100} 
+                                />
                             </div>
                             <div className="auth-field">
-                                <label>Email</label>
-                                <Input required type="email" placeholder="you@example.com" value={form.guestEmail} onChange={set('guestEmail')} />
+                                <label>Email *</label>
+                                <Input 
+                                    required 
+                                    type="email" 
+                                    placeholder="you@example.com" 
+                                    value={form.guestEmail} 
+                                    onChange={set('guestEmail')}
+                                    maxLength={200}
+                                />
                             </div>
                         </div>
                         <div className="auth-field">
-                            <label>Title</label>
-                            <Input required placeholder="Brief summary of the issue" value={form.title} onChange={set('title')} />
+                            <label>Title *</label>
+                            <Input 
+                                required 
+                                placeholder="Brief summary of the issue" 
+                                value={form.title} 
+                                onChange={set('title')}
+                                maxLength={200} 
+                            />
                         </div>
                         <div className="auth-field">
-                            <label>Description</label>
+                            <label>Description *</label>
                             <textarea
                                 required
+                                className="submit-textarea"
                                 placeholder="Describe the issue in detail..."
                                 value={form.description}
                                 onChange={set('description')}
                                 rows={4}
-                                style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14, background: 'var(--bg)', color: 'var(--text-h)', resize: 'vertical' }}
+                                maxLength={2000}
                             />
+                            {form.description.length > 1600 && (
+                                <span className="submit-char-count">
+                                    {form.description.length}/2000
+                                </span>
+                            )}
                         </div>
                         <div className="auth-field">
                             <label>Priority</label>
-                            <select value={form.priority} onChange={set('priority')}
-                                style={{ padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14, background: 'var(--bg)', color: 'var(--text-h)' }}>
-                                {['Low', 'Medium', 'High', 'Critical'].map(p => <option key={p}>{p}</option>)}
+                            <select 
+                                className="submit-select"
+                                value={form.priority} 
+                                onChange={set('priority')}
+                            >
+                                {PRIORITIES.map(p => <option key={p}>{p}</option> )}
                             </select>
                         </div>
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="auth-submit-btn w-full" disabled={loading}>
                             {loading ? 'Submitting...' : 'Submit Ticket'}
                         </Button>
                         <p className="auth-switch">Staff? <Link to="/login">Sign in here</Link></p>

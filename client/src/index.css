@@ -549,6 +549,71 @@ code {
 
 .landing-link:hover { text-decoration: underline; }
 
+/* === Submit Ticket === */
+.submit-textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text-h);
+  resize: vertical;
+  width: 100%;
+  font-family: var(--sans);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.submit-textarea:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.submit-select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text-h);
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.submit-select:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.submit-char-count {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  font-family: var(--mono);
+  text-align: right;
+  display: block;
+  margin-top: 2px;
+}
+
+.submit-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  max-width: 320px;
+  padding: 40px 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08);
+}
+
+.submit-success-icon { font-size: 40px; }
+
+.auth-switch-bold { font-weight: 500; }
+
 /* === Dashboard === */
 .stat-grid {
   display: grid;
