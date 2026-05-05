@@ -7,7 +7,12 @@ import { Input } from '@/components/ui/input'
 
 const INITIAL = { title: '', description: '', priority: 'Low', category: 'Other', guestName: '', guestEmail: '' }
 
-const PRIORITIES = [ 'Low', 'Medium', 'High', 'Critical' ]
+const PRIORITIES = [
+    { value: 'Low',      hint: 'Minor issue, no immediate impact on work.' },
+    { value: 'Medium',   hint: 'Affects productivity but a workaround exists.' },
+    { value: 'High',     hint: 'Significant impact, no workaround available.' },
+    { value: 'Critical', hint: 'Complete work stoppage or security breach.' },
+]
 
 const CATEGORIES = [ 'Hardware', 'Software', 'Network', 'Access', 'Other' ]
 
@@ -73,6 +78,15 @@ export default function SubmitTicket() {
                             <li>⚡ Fast response times</li>
                             <li>🔒 Secure submission</li>
                             <li>📧 Email confirmation</li>
+                        </ul>
+                        <ul className="priority-list">
+                            {PRIORITIES.map(p => (
+                                <li key={p.value}>
+                                    <span className="priority-dot" data-priority={p.value} />
+                                    <span className="priority-list-value">{p.value}</span>
+                                    <span className="priority-list-hint">{p.hint}</span>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
@@ -145,13 +159,16 @@ export default function SubmitTicket() {
                         </div>
                         <div className="auth-field">
                             <label>Priority</label>
-                            <select 
+                            <select
                                 className="submit-select"
-                                value={form.priority} 
+                                value={form.priority}
                                 onChange={set('priority')}
                             >
-                                {PRIORITIES.map(p => <option key={p}>{p}</option> )}
+                                {PRIORITIES.map(p => <option key={p.value}>{p.value}</option>)}
                             </select>
+                            <span className="submit-priority-hint">
+                                {PRIORITIES.find(p => p.value === form.priority)?.hint}
+                            </span>
                         </div>
                         <Button type="submit" className="auth-submit-btn w-full" disabled={loading}>
                             {loading ? 'Submitting...' : 'Submit Ticket'}
