@@ -2,7 +2,12 @@ const BASE = '/api/auth'
 
 const parseJson = async (r) => {
   const text = await r.text()
-  return text ? JSON.parse(text) : {}
+  if (!text) return {}
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error(`Server error(${r.status})`)
+  }
 }
 
 export const authApi = {

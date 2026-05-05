@@ -648,10 +648,12 @@ code {
 
 .priority-list-value {
     display: block;
+    color: white;
 }
 
 .priority-list-hint {
     display: block;
+    color: rgba(255,255,255,0.7);;
     font-size: 10px;
 }
 
@@ -1635,6 +1637,47 @@ code {
     letter-spacing: 0.05em;
     font-family: var(--mono);
     flex: 1;
+}
+
+.add-ticket-modal-wide {
+    max-width: 780px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.add-ticket-split {
+    display: flex;
+    min-height: 480px;
+}
+
+.add-ticket-branding {
+    width: 240px;
+    flex-shrink: 0;
+    background: #0284c7;
+    display: flex;
+    align-items: flex-start;
+    padding: 32px 20px;
+}
+
+.add-ticket-branding-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.add-ticket-form-panel {
+    flex: 1;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.add-ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .add-ticket-modal-body {

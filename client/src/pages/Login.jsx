@@ -19,7 +19,7 @@ export default function Login() {
         setLoading(true)
         const data = await login(form).finally(() => setLoading(false))
         if (data.user) navigate('/login')
-        else setError(data.message || 'Login failed.')
+        else setError(data.message || 'Login failed. Check login credentials.')
     }
 
     return (
