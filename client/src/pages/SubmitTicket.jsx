@@ -24,17 +24,17 @@ export default function SubmitTicket() {
         setLoading(true);
         setErrorMsg('')
         try {
-            const res = await fetch('/api/v1/public/tickets', {
+            const res = await fetch('/api/v1/public-tickets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form)
             })
 
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error ?? 'Submission failed.')
+            if (!res.ok) throw new Error(typeof data.error === 'string' ? data.error : data.message ?? 'Submission failed.')
             setStatus('success')
         } catch (err) {
-            setErrorMsg(err.message)
+            setErrorMsg(typeof err === 'string' ? err : err.message || 'Submission failed.')
         } finally {
             setLoading(false)
         }
