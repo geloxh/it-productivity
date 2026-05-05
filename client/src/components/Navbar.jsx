@@ -5,7 +5,7 @@ import { LogOut, Sun, Moon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const PAGE_TITLES = {
-    '/': 'Dashboard', '/assets': 'Assets', '/tickets': 'Tickets',
+    '/dashboard': 'Dashboard', '/assets': 'Assets', '/tickets': 'Tickets',
     '/projects': 'Projects', '/tasks': 'Tasks',
     '/knowledge-base': 'Knowledge Base', '/user': 'Users', '/sessions': 'Sessions'
 }

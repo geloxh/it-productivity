@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Monitor, Ticket, FolderKanban, CheckSquare, BookOpen, Users, Shield, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const links = [
-    { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/assets', label: 'Assets', icon: Monitor },
     { to: '/tickets', label: 'Tickets', icon: Ticket },
     { to: '/projects', label: 'Projects', icon: FolderKanban },
