@@ -79,15 +79,24 @@ export default function SubmitTicket() {
                             <li>🔒 Secure submission</li>
                             <li>📧 Email confirmation</li>
                         </ul>
-                        <ul className="priority-list">
-                            {PRIORITIES.map(p => (
-                                <li key={p.value}>
-                                    <span className="priority-dot" data-priority={p.value} />
-                                    <span className="priority-list-value">{p.value}</span>
-                                    <span className="priority-list-hint">{p.hint}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="priority-list-wrapper">
+                            <h3 className="priority-list-title">Priority Level</h3>
+                            <ul className="priority-list">
+                                {PRIORITIES.map(p => (
+                                    <li
+                                        key={p.value}
+                                        className={`priority-list-item${form.priority === p.value ? ' priority-list-item--active' : ''}`}
+                                        onClick={() => setForm(f => ({ ...f, priority: p.value }))}
+                                    >
+                                        <span className="priority-dot" data-priority={p.value} />
+                                        <div>
+                                            <span className="priority-list-value">{p.value}</span>
+                                            <span className="priority-list-hint">{p.hint}</span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div className="auth-form-panel">
