@@ -397,14 +397,16 @@ export default function Tickets() {
                                     </div>
                                     {[
                                         { label: 'Category', key: 'category', options: CATEGORIES },
-                                        { label: 'Priority', key: 'priority', options: PRIORITIES },
-                                        { label: 'Status', key: 'status', options: STATUSES },
+                                        { label: 'Priority', key: 'priority', options: PRIORITIES.map(p => p.value) },
+                                        { label: 'Status',   key: 'status',   options: STATUSES },
                                     ].map(({ label, key, options }) => (
                                         <div key={key} className="ticket-modal-prop-row">
                                             <span className="ticket-modal-prop-label">{label}</span>
                                             <Select value={editForm[key]} onValueChange={v => setEditForm(f => ({ ...f, [key]: v }))}>
                                                 <SelectTrigger className="status-select"><SelectValue /></SelectTrigger>
-                                                <SelectContent>{options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                                                <SelectContent>
+                                                    {options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                                                </SelectContent>
                                             </Select>
                                         </div>
                                     ))}
