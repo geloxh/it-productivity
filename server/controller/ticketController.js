@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
 
 exports.publicCreate = async (req, res) => {
     try {
-        const { title, description, priority, guestName, guestEmail } = req.body;
+        const { title, description, priority, category, guestName, guestEmail } = req.body;
         const ticket = await ticketService.createTicket({ title, description, priority, category, guestName, guestEmail });
         res.status(201).json(ticket);
     } catch (error) {

@@ -5,15 +5,17 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-const INITIAL = { title: '', description: '', priority: 'Low', guestName: '', guestEmail: '' }
+const INITIAL = { title: '', description: '', priority: 'Low', category: 'Other', guestName: '', guestEmail: '' }
 
 const PRIORITIES = [ 'Low', 'Medium', 'High', 'Critical' ]
+
+const CATEGORIES = [ 'Hardware', 'Software', 'Network', 'Access', 'Other' ]
 
 export default function SubmitTicket() {
     const [form, setForm] = useState(INITIAL)
     const [status, setStatus] = useState(null)
     const [errorMsg, setErrorMsg] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false) 
 
     const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
 
@@ -32,7 +34,7 @@ export default function SubmitTicket() {
             if (!res.ok) throw new Error(data.error ?? 'Submission failed.')
             setStatus('success')
         } catch (err) {
-            setErrorMsg('err.message')
+            setErrorMsg(err.message)
         } finally {
             setLoading(false)
         }
@@ -113,6 +115,16 @@ export default function SubmitTicket() {
                                 onChange={set('title')}
                                 maxLength={200} 
                             />
+                        </div>
+                        <div className="auth-field">
+                            <label>Category</label>
+                            <select
+                                className="submit-select"
+                                value={form.category}
+                                onChange={set('category')}
+                            >
+                                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                            </select>
                         </div>
                         <div className="auth-field">
                             <label>Description *</label>
