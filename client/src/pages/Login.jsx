@@ -18,7 +18,7 @@ export default function Login() {
         setError('')
         setLoading(true)
         const data = await login(form).finally(() => setLoading(false))
-        if (data.user) navigate('/')
+        if (data.user) navigate('/login')
         else setError(data.message || 'Login failed.')
     }
 

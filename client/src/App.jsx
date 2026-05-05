@@ -29,14 +29,15 @@ export default function App() {
             <Route path="/submit-ticket" element={<SubmitTicket />} />
 
             {/* Public only - logged-in users get redirected to /dashboard */}
-            <Route element={<PublicOnlyRoute />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route element={<PublicOnlyRoute />} >
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
 
             {/* Protected */}
             <Route element={<ProtectedRoute />} >
               <Route element={<DashboardLayout />}>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/assets" element={<Assets />} />
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/projects" element={<Projects />} />
