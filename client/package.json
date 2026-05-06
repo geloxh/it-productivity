@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "main.js",
+  "main": "main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -16,7 +16,7 @@
     "appId": "com.yourcompany.it-productivity",
     "files": [
       "dist/**/*",
-      "main.js"
+      "main.cjs"
     ],
     "win": {
       "target": "nsis"
