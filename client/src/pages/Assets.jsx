@@ -94,6 +94,25 @@ export default function Assets() {
   const { data: assets = [], loading, reload } = useData(fetcher)
   const { viewMode, setViewMode, colOrder, setColOrder, hiddenCols, toggleCol } = useAssetPrefs(user?._id)
 
+  useEffect(() => {
+    const handler = () => {
+      if (localStorage.getItem('panel:reload') === 'assets') {
+        localStorage.removeItem('panel:reload')
+        reload()
+      }
+    }
+    window.addEventListener('storage', handler)
+    return () => window.removeEventListener('storage', handler)
+  }, [reload])
+
+  const handleAddClick = () => {
+    if (isElectron && openPanel) {
+      openPanel({ route: '/panel/assets/new', width: 860, height: 700, title: 'Add Asset' })  
+    } else {
+      setShowForm(true)
+    }
+  }
+
   const [form, setForm] = useState(EMPTY)
   const [showForm, setShowForm] = useState(false)
   const [showColMenu, setShowColMenu] = useState(false)
@@ -197,7 +216,7 @@ export default function Assets() {
           <Button size="sm" variant="outline" onClick={handleExport}>Export CSV</Button>
           <Button size="sm" variant="outline" onClick={() => importRef.current.click()}>Import CSV</Button>
           <input ref={importRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
-          <Button size="sm" onClick={() => setShowForm(true)}>+ Add Asset</Button>
+          <Button size="sm" onClick={handleAddClick}>+ Add Asset</Button>
         </div>
       </div>
 
