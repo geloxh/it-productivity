@@ -45,6 +45,8 @@ export default function App() {
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
                 <Route path="/user" element={<User />} />
                 <Route path="/sessions" element={<Sessions />} />
+                <Route path="/panel/tickets/new" element={<TicketPanel />} />
+                <Route path="/panel/assets/new" element={<AssetPanel />} />
               </Route>
             </Route>
           </Routes>
