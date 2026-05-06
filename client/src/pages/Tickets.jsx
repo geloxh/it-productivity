@@ -1,3 +1,5 @@
+import { useElectron } from '../context/ElectronContext'
+
 import { useState, useCallback, useRef } from 'react'
 import { api } from '../api/index'
 import { useData } from '../hooks/useData'
@@ -30,6 +32,25 @@ export default function Tickets() {
     const { data: tickets = [], loading, reload } = useData(fetcher)
     const usersFetcher = useCallback(() => api.get('/users'), [])
     const { data: users = [] } = useData(usersFetcher)
+
+    const { openPanel, isElectron } = useElectron()
+    useEffect(() => {
+        const handler = () => {
+            if (localStorage.getItem('panel:reload') === 'tickets') {
+                localStorage.removeItem('panel:reload')
+                reload()
+            }
+        }
+        window.addEventListener('storage', handler)
+        return () => window.removeEventListener('storage', handler)
+    }, [reload])
+    const handleAddClick = () => {
+        if (isElectron && openPanel) {
+            openPanel({ route: '/panel/tickets/new', width: 900, height: 650, title: 'New Ticket' })
+        } else {
+            setShowForm(true)
+        }
+    }
 
     const [form, setForm] = useState(EMPTY)
     const [showForm, setShowForm] = useState(false)
@@ -230,7 +251,7 @@ export default function Tickets() {
                     )}
 
                     <Button size="sm" variant="outline" onClick={() => setShowImport(true)}>Import</Button>
-                    <Button size="sm" onClick={() => setShowForm(true)}>+ Add Ticket</Button>
+                    <Button size="sm" onClick={handleAddClick}>+ Add Ticket</Button>
                 </div>
             </div>
 
