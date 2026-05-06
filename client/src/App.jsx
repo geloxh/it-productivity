@@ -10,8 +10,13 @@ const Register = lazy(() => import('./pages/Register'))
 const Landing = lazy(() => import('./pages/Landing'))
 const SubmitTicket = lazy(() => import('./pages/SubmitTicket'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
+
 const Assets = lazy(() => import('./pages/Assets'))
 const Tickets = lazy(() => import('./pages/Tickets'))
+
+const TicketPanel = lazy(() => import('./pages/panels/TicketPanel'))
+const AssetPanel = lazy(() => import('./pages/panels/AssetPanel'))
+
 const Projects = lazy(() => import('./pages/Projects'))
 const Task = lazy(() => import('./pages/Task'))
 const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase'))
