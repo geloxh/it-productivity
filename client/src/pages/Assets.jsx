@@ -1,3 +1,5 @@
+import { useElectron } from '../context/ElectronContext'
+
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { api } from '../api/index'
 import { useData } from '../hooks/useData'
@@ -92,7 +94,10 @@ export default function Assets() {
   const { user } = useAuth()
   const fetcher = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
   const { data: assets = [], loading, reload } = useData(fetcher)
+
   const { viewMode, setViewMode, colOrder, setColOrder, hiddenCols, toggleCol } = useAssetPrefs(user?._id)
+
+  const { openPanel, isElectron } = useElectron()
 
   useEffect(() => {
     const handler = () => {

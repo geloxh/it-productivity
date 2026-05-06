@@ -1,6 +1,6 @@
 import { useElectron } from '../context/ElectronContext'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { api } from '../api/index'
 import { useData } from '../hooks/useData'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,7 @@ export default function Tickets() {
     const { data: users = [] } = useData(usersFetcher)
 
     const { openPanel, isElectron } = useElectron()
+
     useEffect(() => {
         const handler = () => {
             if (localStorage.getItem('panel:reload') === 'tickets') {
@@ -44,6 +45,7 @@ export default function Tickets() {
         window.addEventListener('storage', handler)
         return () => window.removeEventListener('storage', handler)
     }, [reload])
+
     const handleAddClick = () => {
         if (isElectron && openPanel) {
             openPanel({ route: '/panel/tickets/new', width: 900, height: 650, title: 'New Ticket' })
