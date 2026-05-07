@@ -298,21 +298,100 @@ export default function Tickets() {
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="add-ticket-modal-wide">
                     <DialogTitle className="sr-only">New Ticket</DialogTitle>
+                    <div className="add-ticket-split">
 
-                        {/* Titlebar */}
-                        <div className="add-ticket-modal-header">
-                            <span className="add-ticket-modal-title">New Ticket</span>
-                            <span className="add-ticket-modal-subtitle">Fill in the fields below to create a support request</span>
+                        {/* Left branding panel */}
+                        <div className="add-ticket-branding">
+                            <div className="add-ticket-branding-inner">
+                                <div className="auth-logo-box">IT</div>
+                                <h2 className="auth-brand-title">New Ticket</h2>
+                                <p className="auth-brand-sub">Describe the issue and assign it to the right team member.</p>
+                                <div className="priority-list-wrapper">
+                                    <h3 className="priority-list-title">Priority Level</h3>
+                                    <ul className="priority-list">
+                                        {PRIORITIES.map(p => (
+                                            <li
+                                                key={p.value}
+                                                className={`priority-list-item${form.priority === p.value ? ' priority-list-item--active' : ''}`}
+                                                onClick={() => setForm(f => ({ ...f, priority: p.value }))}
+                                            >
+                                                <span className="priority-dot" data-priority={p.value} />
+                                                <div>
+                                                    <span className="priority-list-value">{p.value}</span>
+                                                    <span className="priority-list-hint">{p.hint}</span>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="add-ticket-modal-body">
-                            <div className="add-ticket-modal-field">
-                                <span className="add-ticket-modal-label">Title *</span>
-                                <Input
-                                    required
-                                ></Input>
+                        {/* Right form panel */}
+                        <div className="add-ticket-form-panel">
+                            <div className="auth-form-header">
+                                <h2>New Support Request</h2>
+                                <p className="auth-form-desc">Fill in the details below</p>
                             </div>
-                        </form>
+                            <form onSubmit={handleSubmit} className="add-ticket-form">
+                                <div className="auth-field">
+                                    <label>Title *</label>
+                                    <Input
+                                        required
+                                        placeholder="Brief summary of the issue"
+                                        value={form.title}
+                                        onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                                        maxLength={200}
+                                    />
+                                </div>
+                                <div className="auth-field">
+                                    <label>Description *</label>
+                                    <textarea
+                                        required
+                                        className="submit-textarea"
+                                        placeholder="Describe the issue in detail..."
+                                        value={form.description}
+                                        onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                                        rows={3}
+                                        maxLength={2000}
+                                    />
+                                </div>
+                                <div className="auth-row">
+                                    <div className="auth-field">
+                                        <label>Category</label>
+                                        <select className="submit-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                                            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="auth-field">
+                                        <label>Priority</label>
+                                        <select className="submit-select" value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
+                                            {PRIORITIES.map(p => <option key={p.value}>{p.value}</option>)}
+                                        </select>
+                                        <span className="submit-priority-hint">
+                                            {PRIORITIES.find(p => p.value === form.priority)?.hint}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="auth-field">
+                                    <label>Assign To</label>
+                                    <select
+                                        className="submit-select"
+                                        value={form.assignedTo || 'unassigned'}
+                                        onChange={e => setForm(f => ({ ...f, assignedTo: e.target.value === 'unassigned' ? '' : e.target.value }))}
+                                    >
+                                        <option value="unassigned">Unassigned</option>
+                                        {users.map(u => <option key={u._id} value={u._id}>{u.name ?? u.email}</option>)}
+                                    </select>
+                                </div>
+                                <div className="add-ticket-modal-footer">
+                                    <Button type="button" size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                                    <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Create Ticket'}</Button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
                 </DialogContent>
             </Dialog>
 
