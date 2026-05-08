@@ -226,40 +226,73 @@ export default function Assets() {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="dialog-lg">
-          <DialogHeader><DialogTitle>Add Asset</DialogTitle></DialogHeader>
-          <form onSubmit={handleSubmit} className="assets-form">
-            {FIELDS.map(({ key, label, required }) => (
-              <div key={key} className="assets-field">
-                <label>{label}{required && ' *'}</label>
-                <Input value={form[key]} onChange={set(key)} required={required} />
+        <DialogContent className="add-asset-modal-wide">
+          <DialogTitle className="sr-only">Add Asset</DialogTitle>
+          <div className="add-asset-split">
+
+            {/** Left branding panel */}
+            <div className="add-asset-branding">
+              <div className="add-asset-branding-inner">
+                <div className="auth-logo-box">IT</div>
+                <h2 className="auth-brand-title">New Asset</h2>
+                <p className="auth-brand-sub">Register a new device or resource into the inventory.</p>
+                <ul className="auth-feature-list">
+                  <li>📦 Track by asset tag & serial</li>
+                  <li>👤 Assign to a user</li>
+                  <li>🔧 Monitor equipment status</li>
+                  <li>📄 Manage contract info</li>
+                </ul>
               </div>
-            ))}
-            <div className="assets-field"><label>Category</label>
-              <Select value={form.category} onValueChange={setVal('category')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-              </Select>
             </div>
-            <div className="assets-field"><label>Contract Status</label>
-              <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
+
+            {/** Right form panel */}
+            <div className="add-asset-form-panel">
+              <div className="auth-form-header">
+                <h2>Asset Details</h2>
+                <p className="auth-form-desc">Fill in the fields below to register the asset</p>
+              </div>
+              <form onSubmit={handleSubmit} className="add-asset-form">
+                <div className="add-asset-form-grid">
+                  {FIELDS.map(({ key, label, required }) => (
+                    <div key={key} className="assets-field">
+                      <label>{label}{required && ' *'}</label>
+                      <Input value={form[key]} onChange={set(key)} required={required} />
+                    </div>
+                  ))}
+                  <div className="assets-field">
+                    <label>Category</label>
+                    <Select value={form.category} onValueChange={setVal('category')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="assets-field">
+                    <label>Contract Status</label>
+                    <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="assets-field">
+                    <label>Equipment Status</label>
+                    <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="assets-field">
+                    <label>Date Acquired</label>
+                    <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
+                  </div>
+                </div>
+                <div className="add-asset-modal-footer">
+                  <Button type="button" size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                  <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
+                </div>
+              </form>
             </div>
-            <div className="assets-field"><label>Equipment Status</label>
-              <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="assets-field"><label>Date Acquired</label>
-              <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
-            </div>
-            <div className="assets-form-footer">
-              <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
-            </div>
-          </form>
+            
+          </div>
         </DialogContent>
       </Dialog>
 
