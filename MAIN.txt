@@ -1,0 +1,112 @@
+# IT Productivity Suite - Project Overview & Technical Architecture
+
+This document provides a comprehensive breakdown of the project's architecture, data flows, and module implementation. It is designed to be progressive, moving from high-level concepts to deep technical details.
+
+---
+
+## 1. Project High-Level Overview
+The IT Productivity Suite is a full-stack web and desktop application designed to streamline IT operations. It centralizes ticket management, asset tracking, project coordination, and knowledge sharing into a single platform.
+
+### Core Value Propositions:
+- **Unified IT Operations**: Integrated modules that talk to each other (e.g., tickets linked to assets).
+- **Flexibility**: Accessible via web browsers or as a native desktop application.
+- **Security**: Robust RBAC (Role-Based Access Control) and secure authentication.
+- **Scalability**: Modular architecture allowing easy addition of new features.
+
+---
+
+## 2. Technology Stack
+
+### Backend (The Engine)
+- **Runtime**: Node.js
+- **Framework**: Express.js (RESTful API)
+- **Database**: MongoDB with Mongoose (ODM)
+- **Authentication**: JWT (JSON Web Tokens) stored in HttpOnly cookies.
+- **Validation**: Zod (Schema-based validation)
+- **Security**: Helmet (HTTP headers), CORS, Express Rate Limit.
+- **Logging**: Pino & Morgan for structured observability.
+
+### Frontend (The Interface)
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS 4.0 (Modern, utility-first CSS)
+- **Components**: Shadcn UI (Built on Radix UI primitives)
+- **Routing**: React Router 7
+- **Icons**: Lucide React
+- **Desktop Wrapper**: Electron (Enables native desktop features)
+
+---
+
+## 3. System Architecture & Flow
+
+### 3.1 Architecture Pattern
+The project follows a **Client-Server Architecture** with a clear separation of concerns:
+- **Client**: Responsible for UI/UX, client-side routing, and state management.
+- **Server**: Stateless API handling business logic, data persistence, and security.
+
+### 3.2 Data Flow (Request Lifecycle)
+1. **Frontend Action**: A user interacts with a React component (e.g., submits a ticket).
+2. **API Call**: The client sends a `fetch` request to the backend with `credentials: 'include'`.
+3. **Middleware Chain**:
+    - **CORS/Helmet**: Validates request origin and security headers.
+    - **Rate Limiter**: Prevents brute-force or DDoS attacks.
+    - **Authentication**: `authenticate` middleware verifies the JWT in the cookie.
+    - **Validation**: Zod schemas validate the request body.
+4. **Controller**: Business logic processes the request (e.g., creates a Ticket in MongoDB).
+5. **Response**: Server returns a JSON response (Success/Error).
+6. **UI Update**: Frontend updates the local state or redirects the user.
+
+---
+
+## 4. Key Modules & Features
+
+### 4.1 Authentication & User Management
+- **Flow**: Register -> Login -> Cookie-based JWT -> Persistent Session.
+- **RBAC**: Different permissions for regular Users vs. IT Staff/Admins.
+
+### 4.2 Ticket Management
+- **Public Tickets**: Allows guests to submit tickets without logging in.
+- **Internal Tickets**: Logged-in users can track their requests.
+- **Lifecycle**: Open -> In-Progress -> Resolved -> Closed.
+- **Linking**: Tickets can be linked to specific hardware/software Assets.
+
+### 4.3 Asset Management
+- **Inventory**: Tracking IT assets (Laptops, Servers, Software Licenses).
+- **History**: Audit logs for asset movements or status changes.
+
+### 4.4 Project & Task Tracking
+- **Hierarchy**: Projects contain multiple Tasks.
+- **Collaboration**: Assigning tasks to specific users with deadlines and priorities.
+
+### 4.5 Knowledge Base
+- **Self-Service**: Repository of IT guides and FAQs to reduce common ticket volume.
+
+---
+
+## 5. Scalability & Development Standards
+
+### 5.1 How to Add a New Module (Scalability)
+The project is built to be modular. To add a new feature (e.g., "Inventory"):
+1. **Model**: Create `server/models/Inventory.js`.
+2. **Validator**: Define schemas in `server/validators/inventory.validator.js`.
+3. **Controller**: Implement logic in `server/controller/inventoryController.js`.
+4. **Routes**: Register routes in `server/routes/v1/inventory.routes.js` and link them in `server/routes/index.js`.
+5. **Frontend**: Create pages in `client/src/pages/` and add routes in `client/src/App.jsx`.
+
+### 5.2 Desktop Capability
+By utilizing **Electron**, the same React codebase is wrapped into a desktop app. This allows:
+- System tray notifications.
+- Access to local file systems.
+- Offline-first capabilities (if implemented).
+
+---
+
+## 6. Security Considerations
+- **Password Hashing**: `bcryptjs` with high salt rounds.
+- **No Sensitive Data in JWT**: Tokens only store minimal identifiers.
+- **Input Sanitization**: Handled by Express and Zod validation.
+- **Error Handling**: Centralized error handler to avoid leaking stack traces in production.
+
+---
+
+*This document serves as the primary technical reference for the IT Productivity Suite.*
