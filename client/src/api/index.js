@@ -1,5 +1,5 @@
 const BASE = '/api/v1'
-const ALLOWED = /^\/[a-zA-Z0-9\-/_]+$/
+const ALLOWED = /^\/[a-zA-Z0-9\-/_]+(\?[a-zA-Z0-9\-_=&%.+:,]*)?$/
 
 const req = (method, path, body) => {
     if (!ALLOWED.test(path)) throw new Error('Invalid API path.')
