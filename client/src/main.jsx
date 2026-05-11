@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
       <ElectronProvider>
         <App />
+        <Toaster />
       </ElectronProvider>
-    <Toaster />
   </StrictMode>
 )

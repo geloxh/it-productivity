@@ -23,7 +23,6 @@ const STATUS_COLOR = {
 }
 const EMPTY = { title: '', description: '', priority: 'Medium', project: '', assignedTo: '', dueDate: '', relatedTicket: '', relatedAsset: '' }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function isToday(d) {
     const t = new Date(); return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate()
 }
@@ -52,7 +51,6 @@ function userName(u) {
     return u.firstName ? `${u.firstName} ${u.lastName}` : u.name ?? u.email
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
 function StatusPill({ status }) {
     const s = STATUS_COLOR[status] ?? STATUS_COLOR['To-Do']
     return (
@@ -63,7 +61,6 @@ function StatusPill({ status }) {
     )
 }
 
-// ── Subtask list inside a task row ────────────────────────────────────────────
 function SubtaskList({ task, onUpdate }) {
     const [newTitle, setNewTitle] = useState('')
     const inputRef = useRef(null)
@@ -121,7 +118,6 @@ function SubtaskList({ task, onUpdate }) {
     )
 }
 
-// ── Single task row ───────────────────────────────────────────────────────────
 function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, tickets, assets }) {
     const [expanded, setExpanded] = useState(false)
     const [editing, setEditing] = useState(false)
@@ -168,7 +164,6 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
     return (
         <>
             <div className={`task-list-row${task.status === 'Done' ? ' task-row-done' : ''}${isOverdue ? ' task-row-overdue-bg' : ''}`}>
-                {/* Checkbox to toggle Done */}
                 <input
                     type="checkbox"
                     className="subtask-check"
@@ -176,13 +171,7 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
                     onChange={() => onStatusChange(task._id, task.status === 'Done' ? 'To-Do' : 'Done')}
                     title={task.status === 'Done' ? 'Mark incomplete' : 'Mark done'}
                 />
-
-                {/* Expand subtasks */}
-                <button
-                    className="task-expand-btn"
-                    onClick={() => setExpanded(e => !e)}
-                    title="Subtasks"
-                >
+                <button className="task-expand-btn" onClick={() => setExpanded(e => !e)} title="Subtasks">
                     {subtaskTotal > 0
                         ? <span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: subtaskDone === subtaskTotal ? '#16a34a' : '#0369a1' }}>
                             {subtaskDone}/{subtaskTotal}
@@ -190,25 +179,15 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
                         : <span style={{ fontSize: 11, color: '#bae6fd' }}>▸</span>
                     }
                 </button>
-
-                {/* Title */}
                 <span className="task-list-title" onClick={openEdit} title="Edit task">
                     {task.title}
                     {isOverdue && <span className="task-overdue-tag">overdue</span>}
                     {task.relatedTicket && <span className="task-link-tag">🎫 {task.relatedTicket.title?.slice(0, 20)}</span>}
                     {task.relatedAsset  && <span className="task-link-tag">🖥 {task.relatedAsset.name?.slice(0, 20)}</span>}
                 </span>
-
-                {/* Project */}
                 <span className="task-list-meta">{task.project?.name ?? '—'}</span>
-
-                {/* Assignee */}
                 <span className="task-list-meta">{userName(task.assignedTo) ?? <span style={{ color: 'var(--muted-foreground)' }}>—</span>}</span>
-
-                {/* Priority */}
                 <Badge variant={PRIORITY_VARIANT[task.priority]} style={{ fontSize: 10 }}>{task.priority}</Badge>
-
-                {/* Status inline select */}
                 <Select value={task.status} onValueChange={v => onStatusChange(task._id, v)}>
                     <SelectTrigger className="task-status-trigger" style={{ border: 'none', background: 'transparent', padding: 0, height: 'auto', width: 'auto', gap: 4 }}>
                         <StatusPill status={task.status} />
@@ -217,13 +196,9 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
                         {STATUSES.map(s => <SelectItem key={s} value={s}><StatusPill status={s} /></SelectItem>)}
                     </SelectContent>
                 </Select>
-
-                {/* Due date */}
                 <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: isOverdue ? '#dc2626' : '#7ab8d4', flexShrink: 0 }}>
                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
                 </span>
-
-                {/* Delete */}
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <button className="task-delete-btn" title="Delete">✕</button>
@@ -236,14 +211,12 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
                 </AlertDialog>
             </div>
 
-            {/* Subtasks */}
             {expanded && (
                 <div className="task-subtask-panel">
                     <SubtaskList task={task} onUpdate={onUpdate} />
                 </div>
             )}
 
-            {/* Edit dialog */}
             <Dialog open={editing} onOpenChange={setEditing}>
                 <DialogContent className="dialog-md">
                     <DialogHeader><DialogTitle>Edit Task</DialogTitle></DialogHeader>
@@ -323,7 +296,6 @@ function TaskRow({ task, onStatusChange, onUpdate, onDelete, projects, users, ti
     )
 }
 
-// ── Group section with inline add ─────────────────────────────────────────────
 function TaskGroup({ label, tasks, color, onStatusChange, onUpdate, onDelete, onInlineAdd, projects, users, tickets, assets, defaultProject }) {
     const [inlineTitle, setInlineTitle] = useState('')
     const inputRef = useRef(null)
@@ -356,7 +328,6 @@ function TaskGroup({ label, tasks, color, onStatusChange, onUpdate, onDelete, on
                     assets={assets}
                 />
             ))}
-            {/* Inline add row */}
             <div className="task-inline-add-row">
                 <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1.5px solid #bae6fd', flexShrink: 0 }} />
                 <input
@@ -372,11 +343,11 @@ function TaskGroup({ label, tasks, color, onStatusChange, onUpdate, onDelete, on
     )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
 export default function Tasks() {
     const { user } = useAuth()
+    const { openPanel, isElectron } = useElectron()
 
-    const [viewMode, setViewMode] = useState('mine') // 'mine' | 'all'
+    const [viewMode, setViewMode] = useState('mine')
     const [search, setSearch]     = useState('')
     const [filterStatus, setFilterStatus]     = useState('all')
     const [filterPriority, setFilterPriority] = useState('all')
@@ -390,15 +361,32 @@ export default function Tasks() {
     const ticketFetcher  = useCallback(() => api.get('/tickets').then(d => d.tickets ?? d), [])
     const assetFetcher   = useCallback(() => api.get('/assets').then(d => d.assets ?? d), [])
 
-    const { data: tasks = [],    loading, reload } = useData(taskFetcher)
+    const { data: tasks = [], loading, reload } = useData(taskFetcher)
     const { data: projects = [] } = useData(projectFetcher)
     const { data: users = [] }    = useData(usersFetcher)
     const { data: tickets = [] }  = useData(ticketFetcher)
     const { data: assets = [] }   = useData(assetFetcher)
 
-    const hasFilters = search || filterStatus !== 'all' || filterPriority !== 'all'
+    useEffect(() => {
+        const handler = () => {
+            if (localStorage.getItem('panel:reload') === 'tasks') {
+                localStorage.removeItem('panel:reload')
+                reload()
+            }
+        }
+        window.addEventListener('storage', handler)
+        return () => window.removeEventListener('storage', handler)
+    }, [reload])
 
-    // Default project = first project in list (for inline add)
+    const handleAddClick = () => {
+        if (isElectron && openPanel) {
+            openPanel({ route: '/panel/tasks/new', width: 960, height: 700, title: 'New Task' })
+        } else {
+            setShowForm(true)
+        }
+    }
+
+    const hasFilters = search || filterStatus !== 'all' || filterPriority !== 'all'
     const defaultProject = projects[0]?._id ?? ''
 
     const filtered = tasks.filter(t => {
@@ -427,7 +415,6 @@ export default function Tasks() {
         catch (err) { toast.error(err.message) }
     }
 
-    // Inline quick-add: title + default project, assigned to current user
     const handleInlineAdd = async (title, project) => {
         if (!project) return toast.error('No project available. Create a project first.')
         try {
@@ -441,7 +428,6 @@ export default function Tasks() {
         } catch (err) { toast.error(err.message) }
     }
 
-    // Full form submit
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!form.project) return toast.error('Please select a project.')
@@ -477,7 +463,6 @@ export default function Tasks() {
                     )}
                 </span>
                 <div className="dash-toolbar-right">
-                    {/* My / All toggle */}
                     <div className="assets-view-toggle">
                         <button className={`view-btn${viewMode === 'mine' ? ' active' : ''}`} onClick={() => setViewMode('mine')} title="My tasks">👤</button>
                         <button className={`view-btn${viewMode === 'all'  ? ' active' : ''}`} onClick={() => setViewMode('all')}  title="All tasks">☰</button>
@@ -500,11 +485,10 @@ export default function Tasks() {
                     {hasFilters && (
                         <Button size="sm" variant="ghost" onClick={() => { setSearch(''); setFilterStatus('all'); setFilterPriority('all') }}>✕ Clear</Button>
                     )}
-                    <Button size="sm" onClick={() => setShowForm(true)}>+ Add Task</Button>
+                    <Button size="sm" onClick={handleAddClick}>+ Add Task</Button>
                 </div>
             </div>
 
-            {/* Full add dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="dialog-md">
                     <DialogHeader><DialogTitle>Add Task</DialogTitle></DialogHeader>
@@ -588,7 +572,6 @@ export default function Tasks() {
                     </div>
                 ) : (
                     <>
-                        {/* Column header */}
                         <div className="task-list-header">
                             <span style={{ width: 14 }} />
                             <span style={{ width: 20 }} />
@@ -601,10 +584,10 @@ export default function Tasks() {
                             <span style={{ width: 20 }} />
                         </div>
 
-                        <TaskGroup label="Overdue"    tasks={groups.overdue}   color="#dc2626" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
-                        <TaskGroup label="Today"      tasks={groups.today}     color="#ea580c" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
-                        <TaskGroup label="This Week"  tasks={groups.thisWeek}  color="#0284c7" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
-                        <TaskGroup label="Later"      tasks={groups.later}     color="#7ab8d4" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
+                        <TaskGroup label="Overdue"     tasks={groups.overdue}  color="#dc2626" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
+                        <TaskGroup label="Today"       tasks={groups.today}    color="#ea580c" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
+                        <TaskGroup label="This Week"   tasks={groups.thisWeek} color="#0284c7" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
+                        <TaskGroup label="Later"       tasks={groups.later}    color="#7ab8d4" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
                         <TaskGroup label="No Due Date" tasks={groups.noDue}    color="#7ab8d4" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />
                         {groups.done.length > 0 && (
                             <TaskGroup label={`Done (${groups.done.length})`} tasks={groups.done} color="#16a34a" onStatusChange={handleStatusChange} onUpdate={handleUpdate} onDelete={handleDelete} onInlineAdd={handleInlineAdd} projects={projects} users={users} tickets={tickets} assets={assets} defaultProject={defaultProject} />

@@ -17,9 +17,9 @@ const STATUSES   = ['Planning', 'Active', 'Pending', 'Completed', 'Cancelled']
 
 const PRIORITY_VARIANT = { Low: 'secondary', Medium: 'outline', High: 'default', Critical: 'destructive' }
 const STATUS_COLOR = {
-    Planning:  { bg: '#f0f9ff', color: '#0369a1', border: '#bae6fd' },
-    Active:    { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
-    Pending:   { bg: '#fefce8', color: '#a16207', border: '#fde68a' },
+    Planning: { bg: '#f0f9ff', color: '#0369a1', border: '#bae6fd' },
+    Active: { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
+    Pending: { bg: '#fefce8', color: '#a16207', border: '#fde68a' },
     Completed: { bg: '#f0fdf4', color: '#166534', border: '#86efac' },
     Cancelled: { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' },
 }
