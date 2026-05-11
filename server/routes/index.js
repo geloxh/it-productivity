@@ -14,6 +14,7 @@ const sessionRoutes = require('./v1/session.routes');
 const departmentRoutes = require('./v1/department.routes');
 const knowledgeBaseRoutes = require('./v1/knowledgeBase.routes');
 const dashboardRoutes = require('./v1/dashboard.routes');
+const alertRoutes = require('./v1/alert.routes');
 
 router.get('/v1/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
 
@@ -28,5 +29,6 @@ router.use('/v1/sessions', authenticate, sessionRoutes);
 router.use('/v1/departments', authenticate, departmentRoutes);
 router.use('/v1/knowledge-base', authenticate, knowledgeBaseRoutes);
 router.use('/v1/dashboard', authenticate, dashboardRoutes);
+router.use('/v1/alerts', authenticate, alertRoutes);
 
 module.exports = router;

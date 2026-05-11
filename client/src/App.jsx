@@ -22,6 +22,8 @@ const Task = lazy(() => import('./pages/Task'))
 const KnowledgeBase = lazy(() => import('./pages/KnowledgeBase'))
 const User = lazy(() => import('./pages/User'))
 const Sessions = lazy(() => import('./pages/Sessions'))
+const Alerts = lazy(() => import('./pages/Alerts'))
+const AlertPreferences = lazy(() => import('./pages/AlertPreferences'))
 
 export default function App() {
   return (
@@ -50,6 +52,8 @@ export default function App() {
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
                 <Route path="/user" element={<User />} />
                 <Route path="/sessions" element={<Sessions />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/alerts/preferences" element={<AlertPreferences />} />
                 <Route path="/panel/tickets/new" element={<TicketPanel />} />
                 <Route path="/panel/assets/new" element={<AssetPanel />} />
               </Route>

@@ -46,6 +46,13 @@ const PERMISSIONS = {
         Admin: ['create', 'read', 'update'],
         Employee: ['create', 'read'],
         Guest: ['read']
+    },
+
+    alerts: {
+        SysAdmin: ['create', 'read', 'update', 'delete'],
+        Admin: ['create', 'read', 'update'],
+        Employee: ['read', 'update:own'],
+        Guest: ['read']
     }
 };
 

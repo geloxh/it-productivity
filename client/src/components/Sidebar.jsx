@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Monitor, Ticket, FolderKanban, CheckSquare, BookOpen, Users, Shield, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { LayoutDashboard, Monitor, Ticket, FolderKanban, CheckSquare, BookOpen, Users, Shield, PanelLeftClose, PanelLeftOpen, Bell } from 'lucide-react'
+import { useAlerts } from '../context/AlertContext'
 
 const links = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -8,11 +9,14 @@ const links = [
     { to: '/projects', label: 'Projects', icon: FolderKanban },
     { to: '/tasks', label: 'Tasks', icon: CheckSquare },
     { to: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen },
+    { to: '/alerts', label: 'Alerts', icon: Bell },
     { to: '/user', label: 'Users', icon: Users },
     { to: '/sessions', label: 'Sessions', icon: Shield },
 ]
 
 export default function Sidebar({ collapsed, onToggle }) {
+    const { bellCount } = useAlerts()
+
     return (
         <aside className={`app-sidebar ${collapsed ? 'app-sidebar-collapsed' : ''}`}>
             <div className="app-sidebar-header">
@@ -35,6 +39,9 @@ export default function Sidebar({ collapsed, onToggle }) {
                     >
                         <Icon size={15} />
                         {!collapsed && <span>{label}</span>}
+                        {to === '/alerts' && bellCount > 0 && (
+                            <span className="sidebar-alert-badge">{bellCount > 99 ? '99+' : bellCount}</span>
+                        )}
                     </NavLink>
                 ))}
             </nav>
