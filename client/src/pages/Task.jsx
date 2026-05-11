@@ -386,6 +386,9 @@ export default function Tasks() {
         }
     }
 
+    const PRIORITY_DOT = { Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444', Critical: '#7c3aed' }
+
+
     const hasFilters = search || filterStatus !== 'all' || filterPriority !== 'all'
     const defaultProject = projects[0]?._id ?? ''
 
@@ -490,76 +493,119 @@ export default function Tasks() {
             </div>
 
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="dialog-md">
-                    <DialogHeader><DialogTitle>Add Task</DialogTitle></DialogHeader>
-                    <form onSubmit={handleSubmit} className="dialog-form">
-                        <div className="assets-field">
-                            <label>Title *</label>
-                            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="Task title" />
-                        </div>
-                        <div className="assets-field">
-                            <label>Description</label>
-                            <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Optional description" />
-                        </div>
-                        <div className="task-form-row">
-                            <div className="assets-field">
-                                <label>Project *</label>
-                                <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))}>
-                                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
-                                    <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="assets-field">
-                                <label>Priority</label>
-                                <Select value={form.priority} onValueChange={v => setForm(f => ({ ...f, priority: v }))}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="task-form-row">
-                            <div className="assets-field">
-                                <label>Assign To</label>
-                                <Select value={form.assignedTo || 'unassigned'} onValueChange={v => setForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
-                                    <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="unassigned">Unassigned</SelectItem>
-                                        {users.map(u => <SelectItem key={u._id} value={u._id}>{userName(u)}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="assets-field">
-                                <label>Due Date</label>
-                                <Input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
-                            </div>
-                        </div>
-                        <div className="task-form-row">
-                            <div className="assets-field">
-                                <label>Linked Ticket</label>
-                                <Select value={form.relatedTicket || 'none'} onValueChange={v => setForm(f => ({ ...f, relatedTicket: v === 'none' ? '' : v }))}>
-                                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="none">None</SelectItem>
-                                        {tickets.map(t => <SelectItem key={t._id} value={t._id}>🎫 {t.title?.slice(0, 40)}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="assets-field">
-                                <label>Linked Asset</label>
-                                <Select value={form.relatedAsset || 'none'} onValueChange={v => setForm(f => ({ ...f, relatedAsset: v === 'none' ? '' : v }))}>
-                                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="none">None</SelectItem>
-                                        {assets.map(a => <SelectItem key={a._id} value={a._id}>🖥 {a.name}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
+                <DialogContent className="add-asset-modal-wide" style={{ padding: 0, overflow: 'hidden' }}>
+                    <DialogTitle className="sr-only">Add Task</DialogTitle>
+                    <div className="add-asset-split">
+
+                        {/* Left branding panel */}
+                        <div className="add-asset-branding">
+                            <div className="add-asset-branding-inner">
+                                <div className="auth-logo-box">IT</div>
+                                <h2 className="auth-brand-title">New Task</h2>
+                                <p className="auth-brand-sub">Create a task and track it through to completion.</p>
+
+                                {/* Priority selector */}
+                                <div style={{ marginTop: 12 }}>
+                                    <p className="priority-list-title">Priority</p>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        {PRIORITIES.map(p => (
+                                            <button
+                                                key={p}
+                                                type="button"
+                                                onClick={() => setForm(f => ({ ...f, priority: p }))}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: 8,
+                                                    padding: '5px 8px', borderRadius: 6, border: 'none',
+                                                    background: form.priority === p ? 'rgba(255,255,255,0.15)' : 'transparent',
+                                                    outline: form.priority === p ? '1px solid rgba(255,255,255,0.25)' : 'none',
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                <span style={{
+                                                    width: 8, height: 8, borderRadius: '50%',
+                                                    background: PRIORITY_DOT[p], flexShrink: 0,
+                                                }} />
+                                                <span style={{ fontSize: 12, color: '#fff', fontFamily: 'var(--mono)', fontWeight: form.priority === p ? 600 : 400 }}>{p}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <ul className="auth-feature-list" style={{ marginTop: 16 }}>
+                                    <li>✅ Track status end-to-end</li>
+                                    <li>👤 Assign to a team member</li>
+                                    <li>🎫 Link to a ticket or asset</li>
+                                    <li>📋 Nest subtasks inside</li>
+                                </ul>
                             </div>
                         </div>
-                        <div className="dialog-footer">
-                            <Button type="button" size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-                            <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Task'}</Button>
+
+                        {/* Right form panel */}
+                        <div className="add-asset-form-panel">
+                            <div className="auth-form-header">
+                                <h2>Task Details</h2>
+                                <p className="auth-form-desc">Fill in the fields below to create the task</p>
+                            </div>
+                            <form onSubmit={handleSubmit} className="add-asset-form">
+                                <div className="add-asset-form-grid">
+                                    <div className="assets-field" style={{ gridColumn: '1 / -1' }}>
+                                        <label>Title *</label>
+                                        <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="Task title" />
+                                    </div>
+                                    <div className="assets-field" style={{ gridColumn: '1 / -1' }}>
+                                        <label>Description</label>
+                                        <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Optional description" />
+                                    </div>
+                                    <div className="assets-field">
+                                        <label>Project *</label>
+                                        <Select value={form.project} onValueChange={v => setForm(f => ({ ...f, project: v }))}>
+                                            <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
+                                            <SelectContent>{projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}</SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="assets-field">
+                                        <label>Assign To</label>
+                                        <Select value={form.assignedTo || 'unassigned'} onValueChange={v => setForm(f => ({ ...f, assignedTo: v === 'unassigned' ? '' : v }))}>
+                                            <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="unassigned">Unassigned</SelectItem>
+                                                {users.map(u => <SelectItem key={u._id} value={u._id}>{userName(u)}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="assets-field">
+                                        <label>Due Date</label>
+                                        <Input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
+                                    </div>
+                                    <div className="assets-field">
+                                        <label>Linked Ticket</label>
+                                        <Select value={form.relatedTicket || 'none'} onValueChange={v => setForm(f => ({ ...f, relatedTicket: v === 'none' ? '' : v }))}>
+                                            <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">None</SelectItem>
+                                                {tickets.map(t => <SelectItem key={t._id} value={t._id}>🎫 {t.title?.slice(0, 40)}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="assets-field">
+                                        <label>Linked Asset</label>
+                                        <Select value={form.relatedAsset || 'none'} onValueChange={v => setForm(f => ({ ...f, relatedAsset: v === 'none' ? '' : v }))}>
+                                            <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">None</SelectItem>
+                                                {assets.map(a => <SelectItem key={a._id} value={a._id}>🖥 {a.name}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div className="add-asset-modal-footer">
+                                    <Button type="button" size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                                    <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Task'}</Button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+
+                    </div>
                 </DialogContent>
             </Dialog>
 
