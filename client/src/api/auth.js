@@ -6,7 +6,8 @@ const parseJson = async (r) => {
   try {
     return JSON.parse(text)
   } catch {
-    throw new Error(`Server error(${r.status})`)
+    // Rate limiter and some middleware return plain text — surface it directly
+    throw new Error(text || `Server error (${r.status})`)
   }
 }
 
