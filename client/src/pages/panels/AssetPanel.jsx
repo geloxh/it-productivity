@@ -43,41 +43,68 @@ export default function AssetPanel() {
     }
 
     return (
-        <div style={{ padding: '24px', maxWidth: 640, margin: '0 auto' }}>
-            <h2 style={{ marginBottom: 16 }}>Add Asset</h2>
-            <form onSubmit={handleSubmit} className="assets-form">
-                {FIELDS.map(({ key, label, required }) => (
-                    <div key={key} className="assets-field">
-                        <label>{label}{required && ' *'}</label>
-                        <Input value={form[key]} onChange={set(key)} required={required} />
+        <div className="add-asset-split" style={{ minHeight: '100svh' }}>
+            {/* Left branding panel */}
+            <div className="add-asset-branding">
+                <div className="add-asset-branding-inner">
+                    <div className="auth-logo-box">IT</div>
+                    <h2 className="auth-brand-title">New Asset</h2>
+                    <p className="auth-brand-sub">Register a new device or resource into the inventory.</p>
+                    <ul className="auth-feature-list">
+                        <li>📦 Track by asset tag &amp; serial</li>
+                        <li>👤 Assign to a user</li>
+                        <li>🔧 Monitor equipment status</li>
+                        <li>📄 Manage contract info</li>
+                    </ul>
+                </div>
+            </div>
+
+            {/* Right form panel */}
+            <div className="add-asset-form-panel">
+                <div className="auth-form-header">
+                    <h2>Asset Details</h2>
+                    <p className="auth-form-desc">Fill in the fields below to register the asset</p>
+                </div>
+                <form onSubmit={handleSubmit} className="add-asset-form">
+                    <div className="add-asset-form-grid">
+                        {FIELDS.map(({ key, label, required }) => (
+                            <div key={key} className="assets-field">
+                                <label>{label}{required && ' *'}</label>
+                                <Input value={form[key]} onChange={set(key)} required={required} />
+                            </div>
+                        ))}
+                        <div className="assets-field">
+                            <label>Category</label>
+                            <Select value={form.category} onValueChange={setVal('category')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Contract Status</label>
+                            <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Equipment Status</label>
+                            <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="assets-field">
+                            <label>Date Acquired</label>
+                            <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
+                        </div>
                     </div>
-                ))}
-                <div className="assets-field"><label>Category</label>
-                    <Select value={form.category} onValueChange={setVal('category')}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                </div>
-                <div className="assets-field"><label>Contract Status</label>
-                    <Select value={form.contractStatus} onValueChange={setVal('contractStatus')}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{CONTRACT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                </div>
-                <div className="assets-field"><label>Equipment Status</label>
-                    <Select value={form.equipmentStatus} onValueChange={setVal('equipmentStatus')}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{EQUIPMENT_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                </div>
-                <div className="assets-field"><label>Date Acquired</label>
-                    <Input type="date" value={form.dateAcquired} onChange={set('dateAcquired')} />
-                </div>
-                <div className="assets-form-footer">
-                    <Button type="button" variant="outline" onClick={() => window.close()}>Cancel</Button>
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
-                </div>
-            </form>
+                    <div className="add-asset-modal-footer">
+                        <Button type="button" size="sm" variant="outline" onClick={() => window.close()}>Cancel</Button>
+                        <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Asset'}</Button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }
