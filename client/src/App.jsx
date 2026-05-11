@@ -16,6 +16,7 @@ const Tickets = lazy(() => import('./pages/Tickets'))
 
 const TicketPanel = lazy(() => import('./pages/panels/TicketPanel'))
 const AssetPanel = lazy(() => import('./pages/panels/AssetPanel'))
+const ProjectPanel = lazy(() => import('./pages/panels/ProjectPanel'))
 
 const Projects = lazy(() => import('./pages/Projects'))
 const Task = lazy(() => import('./pages/Task'))
@@ -56,6 +57,7 @@ export default function App() {
                 <Route path="/alerts/preferences" element={<AlertPreferences />} />
                 <Route path="/panel/tickets/new" element={<TicketPanel />} />
                 <Route path="/panel/assets/new" element={<AssetPanel />} />
+                <Route path="/panel/projects/new" element={<ProjectPanel />} />
               </Route>
             </Route>
           </Routes>

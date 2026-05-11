@@ -6,6 +6,7 @@ const { createTaskSchema, updateTaskSchema } = require('../../validators/task.va
 const taskController = require('../../controller/taskController');
 
 router.post('/', checkPermission('tasks', 'create'), validate(createTaskSchema), taskController.create);
+router.get('/workload', checkPermission('tasks', 'read'), taskController.getWorkload);
 router.get('/', checkPermission('tasks', 'read'), taskController.getAll);
 router.get('/:id', checkPermission('tasks', 'read'), taskController.getById);
 router.put('/:id', checkPermission('tasks', 'update'), validate(updateTaskSchema), taskController.update);

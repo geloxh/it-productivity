@@ -47,3 +47,27 @@ exports.remove = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// GET /tasks/workload
+// Returns open task count per assignee across all projects
+exports.getWorkload = async (req, res) => {
+    try {
+        const rows = await Task.aggregate([
+            { $match: { status: { $ne: 'Done' }, assignedTo: { $exists: true, $ne: null } } },
+            { $group: { _id: '$assignedTo', openTasks: { $sum: 1 } } },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+            { $unwind: { path: '$user', preserveNullAndEmpty: false } },
+            { $project: {
+                _id: 1,
+                openTasks: 1,
+                'user.firstName': 1,
+                'user.lastName': 1,
+                'user.email': 1,
+            }},
+            { $sort: { openTasks: -1 } }
+        ]);
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

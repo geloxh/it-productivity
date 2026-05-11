@@ -14,7 +14,9 @@ const updateProjectSchema = z.object({
     description: z.string().optional(),
     status: z.enum(['Planning', 'Active', 'Pending', 'Completed', 'Cancelled']).optional(),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical' ]).optional(),
-    members: z.array(z.string()).optional()
+    members: z.array(z.string()).optional(),
+    startDate: z.string().datetime().optional(),
+    endDate: z.string().datetime().optional()
 });
 
 module.exports = { createProjectSchema, updateProjectSchema };
